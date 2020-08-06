@@ -1,16 +1,15 @@
 #pragma once
-#include <Eigen/Dense>
-
+#include "art/eigen_types.hpp"
 #include "art/rational.hpp"
 
 namespace art {
-struct Point : public Eigen::Vector4d {
-    using Base = Eigen::Vector4d;
+struct Point : public eigen::Vector4d {
+    using Base = eigen::Vector4d;
     Point() = default;
     Point(const Base& v) : Base(v) {}
     static Point Constant(const Rational& r);
-    Point(const Eigen::Vector3d& v) : Base(v.homogeneous()) {}
-    Point(const Eigen::Vector3d& v, double denom = 1.) : Base(v.homogeneous()) {
+    //Point(const eigen::Vector3d& v) : Base(v.homogeneous()) {}
+    Point(const eigen::Vector3d& v, double denom = 1.) : Base(v.homogeneous()) {
         denominator() = denom;
     }
     Point(double a, double b, double c, double denom = 1.) {
@@ -32,8 +31,8 @@ struct Point : public Eigen::Vector4d {
     double& denominator() { return Base::operator()(3); }
     double denominator() const { return Base::operator()(3); }
 
-    const Eigen::Vector4d& homogeneous() const { return *this; }
-    Eigen::Vector4d& homogeneous() { return *this; }
+    const eigen::Vector4d& homogeneous() const { return *this; }
+    eigen::Vector4d& homogeneous() { return *this; }
 
     Point& operator=(const Point&) = default;
     Point& operator=(Point&&) = default;
@@ -54,15 +53,25 @@ struct Point : public Eigen::Vector4d {
         return {numerator() * o.numerator, denominator() * o.denominator};
     }
 
+    inline Point operator/(const Rational& o) const {
+        return {numerator() * o.denominator, denominator() * o.numerator};
+    }
     inline bool operator==(const Point& o) const {
         return numerator() * o.denominator() == denominator() * o.numerator();
+    }
+
+    inline Point cross(const Point& o) const {
+        return {numerator().cross(o.numerator()),
+                denominator() * o.denominator()};
     }
 
     Rational squaredNorm() const {
         return {numerator().squaredNorm(), denominator() * denominator()};
     }
 
-    operator Eigen::Vector3d() const { return numerator() / denominator(); }
+    Rational norm() const { return {numerator().norm(), denominator()}; }
+
+    operator eigen::Vector3d() const { return numerator() / denominator(); }
     operator std::string() const;
 };
 }  // namespace art

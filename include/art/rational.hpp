@@ -23,6 +23,22 @@ struct Rational {
     inline Rational operator*(const Rational& o) const {
         return {numerator * o.numerator, denominator * o.denominator};
     }
+    inline Rational operator/(const Rational& o) const {
+        return {numerator * o.denominator, denominator * o.numerator};
+    }
+
+    inline Rational operator+(double a) const {
+        return {numerator + denominator * a, denominator};
+    }
+    inline Rational operator-(double a) const {
+        return {numerator - denominator * a, denominator};
+    }
+    inline Rational operator*(double a) const {
+        return {numerator * a, denominator};
+    }
+    inline Rational operator/(double a) const {
+        return {numerator, denominator * a};
+    }
 
     inline bool operator==(const Rational& o) const {
         return numerator * o.denominator == denominator * o.numerator;
@@ -35,6 +51,9 @@ struct Rational {
 
     operator double() const { return numerator / denominator; }
     operator std::string() const;
+    Rational abs() const {
+        return { std::abs(numerator), std::abs(denominator) };
+    }
 };
 
 Rational min(const Rational& a, const Rational& b);
