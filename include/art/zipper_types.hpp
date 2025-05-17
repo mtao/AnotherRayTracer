@@ -1,15 +1,18 @@
+
 #pragma once
 
-#include <Eigen/Dense>
+#include <zipper/Matrix.hpp>
+#include <zipper/Vector.hpp>
+#include <zipper/Form.hpp>
 
-namespace art::eigen {
+namespace art{
 template <typename T, int R, int C>
-using Matrix = Eigen::Matrix<T, R, C>;
+using Matrix = zipper::Matrix<T, R, C>;
 
 template <typename T, int R>
-using Vector = Matrix<T, R, 1>;
+using Vector = zipper::Vector<T, R>;
 template <typename T, int R>
-using RowVector = Matrix<T, 1, R>;
+using RowVector = zipper::Form<T, R>;
 
 using Vector3d = Vector<double, 3>;
 using Vector4d = Vector<double, 4>;

@@ -1,0 +1,2 @@
+option('testing', type : 'boolean', value : true, description : 'Enable tests')
+option('examples', type : 'boolean', value : true, description : 'Build examples')

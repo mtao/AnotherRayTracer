@@ -1,15 +1,15 @@
 #pragma once
-#include "art/eigen_types.hpp"
+#include "art/zipper_types.hpp"
 #include "art/rational.hpp"
 
 namespace art {
-struct Point : public eigen::Vector4d {
-    using Base = eigen::Vector4d;
+struct Point : public Vector4d {
+    using Base = Vector4d;
     Point() = default;
     Point(const Base& v) : Base(v) {}
     static Point Constant(const Rational& r);
-    //Point(const eigen::Vector3d& v) : Base(v.homogeneous()) {}
-    Point(const eigen::Vector3d& v, double denom = 1.) : Base(v.homogeneous()) {
+    //Point(const Vector3d& v) : Base(v.homogeneous()) {}
+    Point(const Vector3d& v, double denom = 1.) : Base(v.homogeneous()) {
         denominator() = denom;
     }
     Point(double a, double b, double c, double denom = 1.) {
@@ -31,8 +31,8 @@ struct Point : public eigen::Vector4d {
     double& denominator() { return Base::operator()(3); }
     double denominator() const { return Base::operator()(3); }
 
-    const eigen::Vector4d& homogeneous() const { return *this; }
-    eigen::Vector4d& homogeneous() { return *this; }
+    const Vector4d& homogeneous() const { return *this; }
+    Vector4d& homogeneous() { return *this; }
 
     Point& operator=(const Point&) = default;
     Point& operator=(Point&&) = default;
@@ -71,7 +71,7 @@ struct Point : public eigen::Vector4d {
 
     Rational norm() const { return {numerator().norm(), denominator()}; }
 
-    operator eigen::Vector3d() const { return numerator() / denominator(); }
+    operator Vector3d() const { return numerator() / denominator(); }
     operator std::string() const;
 };
 }  // namespace art

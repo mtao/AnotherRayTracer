@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <optional>
 
 #include "art/geometry/bounding_box.hpp"
 #include "art/geometry/ray.hpp"

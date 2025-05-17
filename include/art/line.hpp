@@ -1,18 +1,18 @@
 #pragma once
-#include "art/eigen_types.hpp"
+#include "art/zipper_types.hpp"
 #include "art/point.hpp"
 #include "art/rational.hpp"
 
 namespace art {
-struct Line : public eigen::Vector6d {
-    using Base = eigen::Vector6d;
+struct Line : public Vector6d {
+    using Base = Vector6d;
     Line() = default;
     Line(const Base& v) : Base(v) {}
     auto moment() { return Base::head<3>(); }
     auto direction() { return Base::tail<3>(); }
     auto moment() const { return Base::head<3>(); }
     auto direction() const { return Base::tail<3>(); }
-    Line(const eigen::Vector3d& a, const eigen::Vector3d& b) {
+    Line(const Vector3d& a, const Vector3d& b) {
         moment() = a.cross(b);
         direction() = b - a;
     }
@@ -22,8 +22,8 @@ struct Line : public eigen::Vector6d {
     Line& operator=(Line&&) = default;
 
 
-    Point momentAsPoint() const { return eigen::Vector3d{Base::head<3>()}; }
-    Point directionAsPoint() const { return eigen::Vector3d{Base::tail<3>()}; }
+    Point momentAsPoint() const { return Vector3d{Base::head<3>()}; }
+    Point directionAsPoint() const { return Vector3d{Base::tail<3>()}; }
 
     Rational distance(const Point& p) const;
     Rational distance(const Line& l) const;
@@ -57,7 +57,7 @@ struct Line : public eigen::Vector6d {
         return {numerator().squaredNorm(), denominator() * denominator()};
     }
 
-    operator eigen::Vector3d() const { return numerator() / denominator(); }
+    operator Vector3d() const { return numerator() / denominator(); }
     */
     operator std::string() const;
 };
