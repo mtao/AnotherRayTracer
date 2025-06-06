@@ -22,8 +22,8 @@ struct Line : public Vector6d {
     Line& operator=(Line&&) = default;
 
 
-    Point momentAsPoint() const { return Vector3d{Base::head<3>()}; }
-    Point directionAsPoint() const { return Vector3d{Base::tail<3>()}; }
+    Point momentAsPoint() const { return Vector3d(Base::head<3>()); }
+    Point directionAsPoint() const { return Vector3d(Base::tail<3>()); }
 
     Rational distance(const Point& p) const;
     Rational distance(const Line& l) const;

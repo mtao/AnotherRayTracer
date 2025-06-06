@@ -1,0 +1,11 @@
+{
+    "src/*.cpp": {
+        "alternate": "include/art/{}.hpp"
+    },
+    "include/art/*.hpp": {
+        "alternate": "src/{}.cpp"
+    },
+    "include/art/*.h": {
+        "alternate": "src/{}.cpp"
+    }
+}

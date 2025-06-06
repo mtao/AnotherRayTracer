@@ -9,7 +9,8 @@ struct Point : public Vector4d {
     Point(const Base& v) : Base(v) {}
     static Point Constant(const Rational& r);
     //Point(const Vector3d& v) : Base(v.homogeneous()) {}
-    Point(const Vector3d& v, double denom = 1.) : Base(v.homogeneous()) {
+    template <zipper::concepts::VectorBaseDerived V> requires(V::extents_type::static_extent(0) == 3)
+    Point(const V& v, double denom = 1.) : Base(v.homogeneous()) {
         denominator() = denom;
     }
     Point(double a, double b, double c, double denom = 1.) {
@@ -37,8 +38,8 @@ struct Point : public Vector4d {
     Point& operator=(const Point&) = default;
     Point& operator=(Point&&) = default;
     inline Point operator+(const Point& o) const {
-        return {numerator() * o.denominator() + denominator() * o.numerator(),
-                denominator() * o.denominator()};
+        return Point(numerator() * o.denominator() + denominator() * o.numerator(),
+                denominator() * o.denominator());
     }
     inline Point operator-() const {
         Point r = *this;
@@ -46,27 +47,27 @@ struct Point : public Vector4d {
         return r;
     }
     inline Point operator-(const Point& o) const {
-        return {numerator() * o.denominator() - denominator() * o.numerator(),
-                denominator() * o.denominator()};
+        return Point(numerator() * o.denominator() - denominator() * o.numerator(),
+                denominator() * o.denominator());
     }
     inline Point operator*(const Rational& o) const {
-        return {numerator() * o.numerator, denominator() * o.denominator};
+        return Point(numerator() * o.numerator, denominator() * o.denominator);
     }
 
     inline Point operator/(const Rational& o) const {
-        return {numerator() * o.denominator, denominator() * o.numerator};
+        return Point(numerator() * o.denominator, denominator() * o.numerator);
     }
     inline bool operator==(const Point& o) const {
         return numerator() * o.denominator() == denominator() * o.numerator();
     }
 
     inline Point cross(const Point& o) const {
-        return {numerator().cross(o.numerator()),
-                denominator() * o.denominator()};
+        return Point(numerator().cross(o.numerator()),
+                denominator() * o.denominator());
     }
 
     Rational squaredNorm() const {
-        return {numerator().squaredNorm(), denominator() * denominator()};
+        return {numerator().norm_powered<2>(), denominator() * denominator()};
     }
 
     Rational norm() const { return {numerator().norm(), denominator()}; }

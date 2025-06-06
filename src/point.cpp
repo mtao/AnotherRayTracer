@@ -2,12 +2,15 @@
 
 #include <fmt/format.h>
 
-#include <Eigen/Dense>
+#include <zipper/views/nullary/ConstantView.hpp>
+
+#include
 
 namespace art {
 Point Point::Constant(const Rational& r) {
     Point p;
-    p.numerator().setConstant(r.numerator);
+    p.numerator() =
+        zipper::views::nullary::ConstantView(r.numerator, Base::extents_type{});
     p.denominator() = r.denominator;
     return p;
 }

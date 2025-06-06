@@ -6,7 +6,7 @@
 namespace art::geometry {
 struct Ray {
     Point origin;
-    Eigen::Vector3d direction;
+    Vector3d direction;
 
     bool hits_bbox(const BoundingBox& bbox, const Rational& min_t) const;
     bool hits_bbox(const BoundingBox& bbox, const Intersection& isect) const;

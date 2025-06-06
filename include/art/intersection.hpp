@@ -6,7 +6,7 @@ namespace art {
 struct Intersection {
     Rational t = 0;
     Point position;
-    Eigen::Vector3d normal;
+    Vector3d normal;
     // std::shared_ptr<Material> material = nullptr;
 };
 }  // namespace art

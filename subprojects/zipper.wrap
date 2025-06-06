@@ -1,3 +1,5 @@
 [wrap-git]
 url = https://github.com/mtao/zipper.git
-revision = e908334fd800e844fe6acc4150727901b557c6cb
+# currently using this repo to dogfood, so i just want the most up-to-date version for now
+revision = main
+#revision = 55cedeeed9836f5656a607d34d770d9d364fb9ad

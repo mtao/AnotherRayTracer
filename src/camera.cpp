@@ -1,58 +1,60 @@
 #include "art/camera.hpp"
 
 #include <iostream>
+#include <zipper/views/nullary/ConstantView.hpp>
 namespace art {
 
-Eigen::Matrix4d Camera::lookAt(const Point& position, const Point& target,
-                               const Point& up) {
-    Eigen::Matrix4d mat;
-    mat.setZero();
-    Eigen::Vector3d forward = (target - position).numerator();
-    Eigen::Vector3d right = up.numerator().cross(forward);
+Matrix4d Camera::lookAt(const Point& position, const Point& target,
+                        const Point& up) {
+    Matrix4d mat;
+    mat = zipper::views::nullary::ConstantView<double, 4, 4>(0);
+    Vector3d forward = (target - position).numerator();
+    Vector3d right = up.numerator().cross(forward);
     // TODO: figure out how to remove these normalizeds
-    mat.block<1, 3>(0, 0) = right.transpose().normalized();
-    mat.block<1, 3>(1, 0) =
-        forward.cross(right).normalized();  // up.numerator().transpose();
-    mat.block<1, 3>(2, 0) = forward.transpose().normalized();
-    mat(3,3) = 1;
+    mat.row(0).head<3>() = right.normalized();
+    mat.row(1).head<3>() = forward.cross(right).normalized();
+    mat.row(2).head<3>() = forward.normalized();
+    mat(3, 3) = 1;
 
-    Eigen::Matrix4d T = Eigen::Matrix4d::Zero();
+    Matrix4d T = T = zipper::views::nullary::ConstantView<double, 4, 4>(0);
+    mat = zipper::views::nullary::ConstantView<double, 3, 3>(0);
     T.col(3) = -position;
-    T.diagonal().array() = position.denominator();
+    T.diagonal() = position.denominator();
     return mat * T;
 }
-//Eigen::Matrix4d Camera::perspective(const Rational& fovy,
-//                                    const Rational& aspect,
-//                                    const Rational& zNear,
-//                                    const Rational& zFar) {
-//    Eigen::Matrix4d R;
-//    R.setZero();
+// Matrix4d Camera::perspective(const Rational& fovy,
+//                                     const Rational& aspect,
+//                                     const Rational& zNear,
+//                                     const Rational& zFar) {
+//     Matrix4d R;
+//     R.setZero();
 //
-//    Rational ymax = std::tan(double(fovy) * M_PI / 360.) * zNear;
-//    Rational xmax = ymax * aspect;
+//     Rational ymax = std::tan(double(fovy) * M_PI / 360.) * zNear;
+//     Rational xmax = ymax * aspect;
 //
-//    Rational temp = 2.0 * zNear;
-//    Rational temp2 = 2 * xmax;
-//    Rational temp3 = 2 * ymax;
-//    Rational temp4 = zFar - zNear;
+//     Rational temp = 2.0 * zNear;
+//     Rational temp2 = 2 * xmax;
+//     Rational temp3 = 2 * ymax;
+//     Rational temp4 = zFar - zNear;
 //
-//    R(0, 0) = double(temp / temp2);
-//    R(1, 1) = double(temp / temp3);
-//    R(2, 2) = double((-zNear - zFar) / temp3);
-//    R(2, 3) = double(-temp * zFar / temp3);
-//    R(3, 2) = -1.;
-//    return R;
-//}
+//     R(0, 0) = double(temp / temp2);
+//     R(1, 1) = double(temp / temp3);
+//     R(2, 2) = double((-zNear - zFar) / temp3);
+//     R(2, 3) = double(-temp * zFar / temp3);
+//     R(3, 2) = -1.;
+//     return R;
+// }
 Image Camera::render(size_t nx, size_t ny, objects::SceneNode& node) const {
     geometry::Ray ray;
     ray.origin = Point(0, 0, 0);
 
-
-    Eigen::Matrix4d CI = _camera_transform.inverse();
+    // Matrix4d CI = _camera_transform.inverse();
+    Matrix4d CI;
+    assert(false);  // TODO: i can't do inverses with zipper yet
     ray.origin.homogeneous() = CI * ray.origin.homogeneous();
 
-    double dx = 1.0 / (nx-1);
-    double dy = 1.0 / (ny-1);
+    double dx = 1.0 / (nx - 1);
+    double dy = 1.0 / (ny - 1);
 
     for (int j = 0; j < ny; ++j) {
         for (int i = 0; i < nx; ++i) {
@@ -60,15 +62,17 @@ Image Camera::render(size_t nx, size_t ny, objects::SceneNode& node) const {
             ray.direction(1) = dy * j - .5;
             ray.direction(2) = -1;
             ray.direction =
-                CI.topLeftCorner<3, 3>().transpose() * ray.direction;
+                CI(zipper::static_slice<0, 3>(), zipper::static_slice<0, 3>())
+                    .transpose() *
+                ray.direction;
             ;
             std::optional<Intersection> isect;
-            //std::cout << std::string(ray.origin) << " => "
-            //          << ray.direction.transpose() << std::endl;
-            //if (node.intersect(ray, isect)) {
-            //    std::cout <<"Hit!" << std::endl;
-            //} else {
-            //}
+            // std::cout << std::string(ray.origin) << " => "
+            //           << ray.direction.transpose() << std::endl;
+            // if (node.intersect(ray, isect)) {
+            //     std::cout <<"Hit!" << std::endl;
+            // } else {
+            // }
             if (node.intersect(ray, isect)) {
                 std::cout << "o";
             } else {
