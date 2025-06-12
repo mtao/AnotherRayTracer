@@ -1,6 +1,7 @@
 #include "art/camera.hpp"
 
 #include <iostream>
+#include <zipper/utils/inverse.hpp>
 #include <zipper/views/nullary/ConstantView.hpp>
 namespace art {
 
@@ -18,8 +19,8 @@ Matrix4d Camera::lookAt(const Point& position, const Point& target,
 
     Matrix4d T = T = zipper::views::nullary::ConstantView<double, 4, 4>(0);
     mat = zipper::views::nullary::ConstantView<double, 3, 3>(0);
-    T.col(3) = -position;
-    T.diagonal() = position.denominator();
+    T.col(3) = (-position).homogeneous();
+    T.diagonal() = zipper::views::nullary::ConstantView(position.denominator());
     return mat * T;
 }
 // Matrix4d Camera::perspective(const Rational& fovy,
@@ -48,16 +49,31 @@ Image Camera::render(size_t nx, size_t ny, objects::SceneNode& node) const {
     geometry::Ray ray;
     ray.origin = Point(0, 0, 0);
 
-    // Matrix4d CI = _camera_transform.inverse();
     Matrix4d CI;
-    assert(false);  // TODO: i can't do inverses with zipper yet
+    // Matrix4d CI = _camera_transform.inverse();
+    /*
+    Matrix4d CI = zipper::views::nullary::ConstantView<double, 4, 4>(0);
+    auto camera_rot = _camera_transform(zipper::static_slice<0, 3>(),
+                                        zipper::static_slice<0, 3>());
+    zipper::VectorBase camera_t =
+        _camera_transform(zipper::static_slice<3, 1>(),
+                          zipper::static_slice<0, 3>())
+            .view();
+    auto R = CI(zipper::static_slice<0, 3>(), zipper::static_slice<0, 3>());
+    zipper::VectorBase T =
+        CI(zipper::static_slice<3, 1>(), zipper::static_slice<0, 3>()).view();
+
+    R = zipper::utils::inverse(camera_rot);
+    T = -R * camera_t;
+    */
+
     ray.origin.homogeneous() = CI * ray.origin.homogeneous();
 
     double dx = 1.0 / (nx - 1);
     double dy = 1.0 / (ny - 1);
 
-    for (int j = 0; j < ny; ++j) {
-        for (int i = 0; i < nx; ++i) {
+    for (size_t j = 0; j < ny; ++j) {
+        for (size_t i = 0; i < nx; ++i) {
             ray.direction(0) = dx * i - .5;
             ray.direction(1) = dy * j - .5;
             ray.direction(2) = -1;

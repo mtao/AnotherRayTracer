@@ -1,10 +1,9 @@
 #include "art/point.hpp"
 
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 
 #include <zipper/views/nullary/ConstantView.hpp>
-
-#include
 
 namespace art {
 Point Point::Constant(const Rational& r) {
@@ -45,7 +44,7 @@ Point::Point(const Rational& a, const Rational& b, const Rational& c) {
     }
 }
 Point::operator std::string() const {
-    return fmt::format("P[({} {} {})/{}]", numerator().x(), numerator().y(),
-                       numerator().z(), denominator());
+    return fmt::format("P[({})/{}]", fmt::join(numerator(), " "),
+                       denominator());
 }
 }  // namespace art
