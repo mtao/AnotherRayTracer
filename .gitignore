@@ -39,3 +39,10 @@
 /.vs
 /out/build/x64-Debug
 /CMakeSettings.json
+
+.cache
+
+compile_commands.json
+
+
+/build*
