@@ -1,6 +1,5 @@
 #include "art/objects/scene_node.hpp"
 
-#include <spdlog/spdlog.h>
 
 namespace art::objects {
 
@@ -19,8 +18,6 @@ void SceneNode::add_node(Object::Ptr node) {
 }
 bool SceneNode::intersect(const geometry::Ray& ray,
                           std::optional<Intersection>& isect) const {
-    // spdlog::info("SceneNode got ray {} + t [{}]", std::string(ray.origin),
-    //              fmt::join(ray.direction, ","));
     if (!ray.hits_bbox(bbox(), isect)) {
         return false;
     }

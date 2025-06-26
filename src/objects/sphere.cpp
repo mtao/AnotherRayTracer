@@ -1,7 +1,6 @@
 
 #include "art/objects/sphere.hpp"
 
-#include <spdlog/spdlog.h>
 
 namespace art::objects {
 void Sphere::update_bbox() {
@@ -10,7 +9,7 @@ void Sphere::update_bbox() {
 bool Sphere::intersect(const geometry::Ray& ray,
                        std::optional<Intersection>& isect) const {
     const auto& d = ray.direction;
-    spdlog::info("{} + t [{}]", std::string(ray.origin), fmt::join(d, ","));
+    //spdlog::info("{} + t [{}]", std::string(ray.origin), fmt::join(d, ","));
     Rational a = ray.direction.norm_powered<2>();
     Rational b(2 * ray.origin.numerator().dot(ray.direction),
                ray.origin.denominator());
