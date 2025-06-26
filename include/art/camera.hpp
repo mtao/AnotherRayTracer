@@ -20,6 +20,10 @@ class Camera {
 
     Image render(size_t nx, size_t ny, objects::SceneNode& node) const;
 
+    const Matrix4d& transform() const {
+        return _camera_transform;
+    }
+
    private:
     Matrix4d _camera_transform;
     // Point origin;

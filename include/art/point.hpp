@@ -10,7 +10,8 @@ struct Point : public Vector4d {
     static Point Constant(const Rational& r);
     //Point(const Vector3d& v) : Base(v.homogeneous()) {}
     template <zipper::concepts::VectorBaseDerived V> requires(V::extents_type::static_extent(0) == 3)
-    Point(const V& v, double denom = 1.) : Base(v.homogeneous()) {
+    Point(const V& v, double denom = 1.) {
+        numerator() = v;
         denominator() = denom;
     }
     Point(double a, double b, double c, double denom = 1.) {
@@ -35,7 +36,11 @@ struct Point : public Vector4d {
     const Vector4d& homogeneous() const { return *this; }
     Vector4d& homogeneous() { return *this; }
 
-    Point& operator=(const Point&) = default;
+    Point& operator=(const Point& o) {
+        // TODO: why can't this be default
+        *this = o.homogeneous();
+        return *this;
+    }
     Point& operator=(Point&&) = default;
     inline Point operator+(const Point& o) const {
         return Point(numerator() * o.denominator() + denominator() * o.numerator(),

@@ -12,7 +12,7 @@ class Object {
     using Ptr = std::shared_ptr<Object>;
     const geometry::BoundingBox& bbox() const { return _bbox; }
     virtual void update_bbox() = 0;
-    void set_bbox(const geometry::BoundingBox& bbox) { /*_bbox = bbox;*/ }
+    void set_bbox(const geometry::BoundingBox& bbox) { _bbox = bbox; }
 
     virtual bool intersect(const geometry::Ray& ray,
                            std::optional<Intersection>& isect) const = 0;

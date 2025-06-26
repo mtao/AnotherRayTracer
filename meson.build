@@ -1,6 +1,6 @@
 project('AnotherRayTracer', 'cpp',
   version : '0.1',
-  default_options : ['warning_level=3', 'cpp_std=c++20'])
+  default_options : ['warning_level=3', 'cpp_std=c++23'])
 
 
 
@@ -36,11 +36,11 @@ required_deps = [range_v3_dep, zipper_dep]
 internal_deps = [spdlog_dep, fmt_dep] + required_deps
 
 lib_sources = [
-    'src/geometry/bounding_box.cpp'
+    'src/point.cpp'
+    ,'src/geometry/bounding_box.cpp'
     ,'src/objects/sphere.cpp'
     ,'src/objects/scene_node.cpp'
     ,'src/camera.cpp'
-    ,'src/point.cpp'
     ,'src/line.cpp'
     ,'src/rational.cpp'
     ,'src/geometry/ray.cpp'

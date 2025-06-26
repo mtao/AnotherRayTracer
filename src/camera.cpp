@@ -17,8 +17,11 @@ Matrix4d Camera::lookAt(const Point& position, const Point& target,
     mat.row(2).head<3>() = forward.normalized();
     mat(3, 3) = 1;
 
-    Matrix4d T = T = zipper::views::nullary::ConstantView<double, 4, 4>(0);
-    mat = zipper::views::nullary::ConstantView<double, 3, 3>(0);
+    Matrix4d T = zipper::views::nullary::ConstantView<double, 4, 4>(0);
+    T(0, 0) = 1;
+    T(1, 1) = 1;
+    T(2, 2) = 1;
+    // mat = zipper::views::nullary::ConstantView<double, 3, 3>(0);
     T.col(3) = (-position).homogeneous();
     T.diagonal() = zipper::views::nullary::ConstantView(position.denominator());
     return mat * T;
@@ -49,23 +52,15 @@ Image Camera::render(size_t nx, size_t ny, objects::SceneNode& node) const {
     geometry::Ray ray;
     ray.origin = Point(0, 0, 0);
 
-    Matrix4d CI;
     // Matrix4d CI = _camera_transform.inverse();
-    /*
     Matrix4d CI = zipper::views::nullary::ConstantView<double, 4, 4>(0);
-    auto camera_rot = _camera_transform(zipper::static_slice<0, 3>(),
-                                        zipper::static_slice<0, 3>());
-    zipper::VectorBase camera_t =
-        _camera_transform(zipper::static_slice<3, 1>(),
-                          zipper::static_slice<0, 3>())
-            .view();
+    zipper::Matrix camera_rot = _camera_transform(zipper::static_slice<0, 3>(),
+                                                  zipper::static_slice<0, 3>());
+    zipper::Vector camera_t = _camera_transform.col(3).head<3>();
     auto R = CI(zipper::static_slice<0, 3>(), zipper::static_slice<0, 3>());
-    zipper::VectorBase T =
-        CI(zipper::static_slice<3, 1>(), zipper::static_slice<0, 3>()).view();
 
     R = zipper::utils::inverse(camera_rot);
-    T = -R * camera_t;
-    */
+    CI.col(3) = (-R * camera_t).homogeneous();
 
     ray.origin.homogeneous() = CI * ray.origin.homogeneous();
 

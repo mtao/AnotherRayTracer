@@ -8,15 +8,14 @@
 namespace art {
 Point Point::Constant(const Rational& r) {
     Point p;
-    p.numerator() =
-        zipper::views::nullary::ConstantView(r.numerator, Base::extents_type{});
+    p.numerator() = zipper::views::nullary::ConstantView(r.numerator);
     p.denominator() = r.denominator;
     return p;
 }
 Point::Point(const Rational& a, const Rational& b, const Rational& c) {
     auto n = numerator();
     auto& d = denominator();
-    if (a.denominator == b.denominator == c.denominator) {
+    if (a.denominator == b.denominator && a.denominator == c.denominator) {
         n(0) = a.numerator;
         n(1) = b.numerator;
         n(2) = c.numerator;
@@ -44,7 +43,7 @@ Point::Point(const Rational& a, const Rational& b, const Rational& c) {
     }
 }
 Point::operator std::string() const {
-    return fmt::format("P[({})/{}]", fmt::join(numerator(), " "),
+    return fmt::format("P[({})/{}]", fmt::join(numerator().eval(), " "),
                        denominator());
 }
 }  // namespace art
