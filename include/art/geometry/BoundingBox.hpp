@@ -1,5 +1,5 @@
 #pragma once
-#include "art/point.hpp"
+#include "art/Point.hpp"
 
 namespace art::geometry {
 class BoundingBox {

@@ -2,9 +2,9 @@
 #include <memory>
 #include <optional>
 
-#include "art/geometry/bounding_box.hpp"
-#include "art/geometry/ray.hpp"
-#include "art/intersection.hpp"
+#include "art/geometry/BoundingBox.hpp"
+#include "art/geometry/Ray.hpp"
+#include "art/Intersection.hpp"
 
 namespace art::objects {
 class Object {

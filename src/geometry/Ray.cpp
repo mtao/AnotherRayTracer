@@ -1,4 +1,4 @@
-#include "art/geometry/ray.hpp"
+#include "art/geometry/Ray.hpp"
 namespace art::geometry {
 Point Ray::operator()(const Rational& t) const {
     return origin + Point(t.numerator * direction, t.denominator);

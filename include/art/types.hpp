@@ -1,4 +1,4 @@
 #pragma once
-#include "art/line.hpp"
-#include "art/point.hpp"
-#include "art/rational.hpp"
+#include "art/geometry/Line.hpp"
+#include "art/Point.hpp"
+#include "art/Rational.hpp"

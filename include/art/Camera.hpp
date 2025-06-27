@@ -1,8 +1,8 @@
 #pragma once
 
-#include "art/image.hpp"
-#include "art/objects/scene_node.hpp"
-#include "art/point.hpp"
+#include "art/Image.hpp"
+#include "art/objects/SceneNode.hpp"
+#include "art/Point.hpp"
 
 namespace art {
 

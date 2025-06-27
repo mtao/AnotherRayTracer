@@ -36,14 +36,14 @@ required_deps = [range_v3_dep, zipper_dep]
 internal_deps = [spdlog_dep, fmt_dep] + required_deps
 
 lib_sources = [
-    'src/point.cpp'
-    ,'src/geometry/bounding_box.cpp'
-    ,'src/objects/sphere.cpp'
-    ,'src/objects/scene_node.cpp'
-    ,'src/camera.cpp'
-    ,'src/line.cpp'
-    ,'src/rational.cpp'
-    ,'src/geometry/ray.cpp'
+    'src/Point.cpp'
+    ,'src/geometry/BoundingBox.cpp'
+    ,'src/objects/Sphere.cpp'
+    ,'src/objects/SceneNode.cpp'
+    ,'src/Camera.cpp'
+    ,'src/geometry/Line.cpp'
+    ,'src/Rational.cpp'
+    ,'src/geometry/Ray.cpp'
 ]
 
 include_dirs = [include_directories('include')]

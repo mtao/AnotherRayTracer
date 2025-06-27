@@ -1,7 +1,7 @@
 #pragma once
-#include "art//intersection.hpp"
-#include "art/geometry/bounding_box.hpp"
-#include "art/point.hpp"
+#include "art/Intersection.hpp"
+#include "art/geometry/BoundingBox.hpp"
+#include "art/Point.hpp"
 
 namespace art::geometry {
 struct Ray {

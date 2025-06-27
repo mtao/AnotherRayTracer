@@ -1,5 +1,5 @@
 #pragma once
-#include "art/objects/object.hpp"
+#include "art/objects/Object.hpp"
 
 namespace art::objects {
 // A unit sphere stored at the origin

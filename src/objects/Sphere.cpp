@@ -1,5 +1,5 @@
 
-#include "art/objects/sphere.hpp"
+#include "art/objects/Sphere.hpp"
 
 
 namespace art::objects {

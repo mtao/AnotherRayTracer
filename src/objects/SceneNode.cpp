@@ -1,4 +1,4 @@
-#include "art/objects/scene_node.hpp"
+#include "art/objects/SceneNode.hpp"
 
 
 namespace art::objects {

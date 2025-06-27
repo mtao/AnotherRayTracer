@@ -1,6 +1,6 @@
-#include "art/camera.hpp"
-#include "art/objects/scene_node.hpp"
-#include "art/objects/sphere.hpp"
+#include "art/Camera.hpp"
+#include "art/objects/SceneNode.hpp"
+#include "art/objects/Sphere.hpp"
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
 #include <iostream>

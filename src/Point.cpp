@@ -1,4 +1,4 @@
-#include "art/point.hpp"
+#include "art/Point.hpp"
 
 #include <fmt/format.h>
 #include <fmt/ranges.h>

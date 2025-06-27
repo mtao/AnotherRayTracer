@@ -1,6 +1,6 @@
 #pragma once
 #include "art/zipper_types.hpp"
-#include "art/rational.hpp"
+#include "art/Rational.hpp"
 
 namespace art {
 struct Point : public Vector4d {

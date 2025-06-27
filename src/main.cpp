@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "art/camera.hpp"
-#include "art/objects/scene_node.hpp"
-#include "art/objects/sphere.hpp"
+#include "art/Camera.hpp"
+#include "art/objects/SceneNode.hpp"
+#include "art/objects/Sphere.hpp"
 
 int main(int argc, char* argv[]) {
     using namespace art;

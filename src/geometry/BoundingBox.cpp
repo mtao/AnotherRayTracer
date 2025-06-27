@@ -1,4 +1,4 @@
-#include "art/geometry/bounding_box.hpp"
+#include "art/geometry/BoundingBox.hpp"
 
 #include <array>
 namespace art::geometry {

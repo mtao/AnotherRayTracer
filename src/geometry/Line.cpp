@@ -1,4 +1,4 @@
-#include "art/line.hpp"
+#include "art/geometry/Line.hpp"
 #include <fmt/format.h>
 #include <zipper/utils/maxCoeff.hpp>
 

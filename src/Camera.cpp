@@ -1,4 +1,4 @@
-#include "art/camera.hpp"
+#include "art/Camera.hpp"
 
 #include <iostream>
 #include <zipper/utils/inverse.hpp>

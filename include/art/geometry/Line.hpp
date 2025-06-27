@@ -1,7 +1,7 @@
 #pragma once
 #include "art/zipper_types.hpp"
-#include "art/point.hpp"
-#include "art/rational.hpp"
+#include "art/Point.hpp"
+#include "art/Rational.hpp"
 
 namespace art {
 struct Line : public Vector6d {
