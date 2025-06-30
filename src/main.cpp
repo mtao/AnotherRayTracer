@@ -17,6 +17,7 @@ int main(int argc, char* argv[]) {
     //     /*zfar=*/10));
     objects::SceneNode scene;
     scene.add_node(std::make_shared<objects::Sphere>());
+    scene.update_bbox();
 
     Image img = cam.render(100, 100, scene);
     return 0;

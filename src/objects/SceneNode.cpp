@@ -1,5 +1,6 @@
 #include "art/objects/SceneNode.hpp"
 
+#include <spdlog/spdlog.h>
 
 namespace art::objects {
 
@@ -8,8 +9,10 @@ void SceneNode::update_bbox() {
     geometry::BoundingBox bbox;
     for (auto&& c : _children) {
         c->update_bbox();
+        spdlog::info("child {} {}", c->bbox().min(), c->bbox().max());
         bbox.expand(c->bbox());
     }
+    spdlog::info("{} {}", bbox.min(), bbox.max());
     set_bbox(bbox);
 }
 void SceneNode::add_node(Object::Ptr node) {
@@ -21,6 +24,7 @@ bool SceneNode::intersect(const geometry::Ray& ray,
     if (!ray.hits_bbox(bbox(), isect)) {
         return false;
     }
+
     for (auto&& c : _children) {
         if (!ray.hits_bbox(c->bbox(), isect)) {
             continue;

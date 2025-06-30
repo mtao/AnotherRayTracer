@@ -4,6 +4,8 @@
 #include "art/Rational.hpp"
 
 namespace art {
+    // Representation of a line using Plucker coordinates
+    // I'm new to Plucker coordinates, but my hope is that it'll present an easier 
 struct Line : public Vector6d {
     using Base = Vector6d;
     Line() = default;
@@ -27,9 +29,15 @@ struct Line : public Vector6d {
 
     Rational distance(const Point& p) const;
     Rational distance(const Line& l) const;
+
+    // 
     double reciprocalProduct(const Line& l) const;
 
     Point smallestPoint() const;
+    Line commonPerpendicular(const Line& l) const;
+
+    // foot of the perppendicular on this line to the other line
+    Point foot(const Line& l) const;
     /*
 
     inline Line operator+(const Line& o) const {
