@@ -1,5 +1,5 @@
-#include "art/geometry/Ray.hpp"
-namespace art::geometry {
+#include "art/Ray.hpp"
+namespace art {
 
 std::string format_as(const Ray& r) {
     return fmt::format("Ray[{}+t{}]", r.origin, r.direction);
@@ -7,7 +7,7 @@ std::string format_as(const Ray& r) {
 Point Ray::operator()(const Rational& t) const {
     return origin + Point(t.numerator * direction, t.denominator);
 }
-bool Ray::hits_bbox(const BoundingBox& bbox, const Rational& min_t) const {
+bool Ray::hits_bbox(const geometry::Box& bbox, const Rational& min_t) const {
     const Point p = (*this)(min_t);
     // spdlog::info("Ray bbox check on ray {}, BBox {}, mint {}", *this, bbox,
     //              min_t);
@@ -62,10 +62,11 @@ bool Ray::hits_bbox(const BoundingBox& bbox, const Rational& min_t) const {
     }
     return true;
 }
-bool Ray::hits_bbox(const BoundingBox& bbox, const Intersection& isect) const {
+bool Ray::hits_bbox(const geometry::Box& bbox,
+                    const Intersection& isect) const {
     return hits_bbox(bbox, isect.t);
 }
-bool Ray::hits_bbox(const BoundingBox& bbox,
+bool Ray::hits_bbox(const geometry::Box& bbox,
                     const std::optional<Intersection>& isect) const {
     if (isect) {
         return hits_bbox(bbox, *isect);
@@ -73,4 +74,4 @@ bool Ray::hits_bbox(const BoundingBox& bbox,
         return hits_bbox(bbox, 0.0);
     }
 }
-}  // namespace art::geometry
+}  // namespace art

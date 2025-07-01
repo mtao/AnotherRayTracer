@@ -37,13 +37,16 @@ internal_deps = [spdlog_dep, fmt_dep] + required_deps
 
 lib_sources = [
     'src/Point.cpp'
-    ,'src/geometry/BoundingBox.cpp'
-    ,'src/objects/Sphere.cpp'
-    ,'src/objects/SceneNode.cpp'
+
+    ,'src/geometry/Box.cpp'
+    ,'src/geometry/Sphere.cpp'
+
+    #,'src/objects/SceneNode.cpp'
+
     ,'src/Camera.cpp'
     ,'src/geometry/Line.cpp'
     ,'src/Rational.cpp'
-    ,'src/geometry/Ray.cpp'
+    ,'src/Ray.cpp'
 ]
 
 include_dirs = [include_directories('include')]
@@ -53,7 +56,7 @@ art_lib = library('art', lib_sources, include_directories: include_dirs, depende
 art_dep = declare_dependency(link_with: art_lib, dependencies: required_deps, include_directories: include_dirs)
 
 
-art_exec = executable('art', 'src/main.cpp', dependencies: [art_dep] + internal_deps)
+#art_exec = executable('art', 'src/main.cpp', dependencies: [art_dep] + internal_deps)
 
 
 if get_option('testing')
