@@ -3,6 +3,8 @@
 #include <iostream>
 #include <zipper/utils/inverse.hpp>
 #include <zipper/views/nullary/ConstantView.hpp>
+
+#include "art/Ray.hpp"
 namespace art {
 
 Matrix4d Camera::lookAt(const Point& position, const Point& target,
@@ -49,7 +51,7 @@ Matrix4d Camera::lookAt(const Point& position, const Point& target,
 //     return R;
 // }
 Image Camera::render(size_t nx, size_t ny, objects::SceneNode& node) const {
-    geometry::Ray ray;
+    Ray ray;
     ray.origin = Point(0, 0, 0);
 
     // Matrix4d CI = _camera_transform.inverse();

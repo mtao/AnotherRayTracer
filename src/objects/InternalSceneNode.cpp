@@ -1,34 +1,37 @@
-#include "art/objects/SceneNode.hpp"
+#include "art/objects/InternalSceneNode.hpp"
 
 #include <spdlog/spdlog.h>
 
 namespace art::objects {
 
-auto SceneNode::create() -> Ptr { return std::make_shared<SceneNode>(); }
-void SceneNode::update_bbox() {
-    geometry::BoundingBox bbox;
-    for (auto&& c : _children) {
-        c->update_bbox();
-        bbox.expand(c->bbox());
-    }
-    set_bbox(bbox);
+auto InternalSceneNode::create() -> Ptr {
+    return std::make_shared<InternalSceneNode>();
 }
-void SceneNode::add_node(Object::Ptr node) {
+void InternalSceneNode::update_bounding_box() {
+    geometry::Box bounding_box;
+    for (auto&& c : _children) {
+        c->update_bounding_box();
+        // TODO: update coordinate system
+        bounding_box.expand(c->bounding_box());
+    }
+    spdlog::info("{}", bounding_box);
+    set_bounding_box(bounding_box);
+}
+void InternalSceneNode::add_node(SceneNode::Ptr node) {
     _children.push_back(node);
-    set_bbox(geometry::BoundingBox(bbox()).expand(node->bbox()));
+    set_bounding_box(
+        geometry::Box(bounding_box()).expand(node->bounding_box()));
 }
-bool SceneNode::intersect(const geometry::Ray& ray,
-                          std::optional<Intersection>& isect) const {
-    if (!ray.hits_bbox(bbox(), isect)) {
-        return false;
-    }
-
-    for (auto&& c : _children) {
-        if (!ray.hits_bbox(c->bbox(), isect)) {
-            continue;
+bool InternalSceneNode::intersect(const Ray& ray,
+                                  std::optional<Intersection>& isect) const {
+    if (intersects_bounding_box(ray)) {
+        bool succ = false;
+        // TODO: update coordinate system
+        for (auto&& c : _children) {
+            succ |= c->intersect(ray, isect);
         }
-        c->intersect(ray, isect);
+        return succ;
     }
-    return isect.has_value();
+    return false;
 }
 }  // namespace art::objects

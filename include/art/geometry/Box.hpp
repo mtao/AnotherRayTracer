@@ -26,6 +26,9 @@ class Box : public Geometry {
     bool intersect(const Ray& ray,
                    std::optional<Intersection>& isect) const override;
 
+    // an alternate intersection that doesn't fill an isect object
+    bool intersect(const Ray& ray) const;
+
    private:
     Point _min;
     Point _max;

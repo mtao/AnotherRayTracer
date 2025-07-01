@@ -1,8 +1,8 @@
 #include <iostream>
 
 #include "art/Camera.hpp"
-#include "art/objects/SceneNode.hpp"
-#include "art/objects/Sphere.hpp"
+#include "art/objects/Object.hpp"
+#include "art/geometry/Sphere.hpp"
 
 int main(int argc, char* argv[]) {
     using namespace art;
@@ -15,10 +15,9 @@ int main(int argc, char* argv[]) {
     //     /*aspect=*/1.,
     //     /*znear=*/0.1,
     //     /*zfar=*/10));
-    objects::SceneNode scene;
-    scene.add_node(std::make_shared<objects::Sphere>());
-    scene.update_bbox();
+    objects::Object sphere(*std::make_shared<geometry::Sphere>());
+    sphere.update_bounding_box();
 
-    Image img = cam.render(100, 100, scene);
+    Image img = cam.render(100, 100, sphere);
     return 0;
 }

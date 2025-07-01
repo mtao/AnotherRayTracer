@@ -1,7 +1,5 @@
 #include "art/geometry/Box.hpp"
 
-#include <spdlog/spdlog.h>
-
 #include <array>
 #include <zipper/views/nullary/UnitView.hpp>
 
@@ -14,10 +12,10 @@ std::string format_as(const Box& r) {
 
 Box Box::bounding_box() const { return *this; }
 bool Box::intersect(const Ray& ray, std::optional<Intersection>& isect) const {
-    Rational max_t = isect.has_value() ? isect->t : Rational(0);
-    const Point p = ray(max_t);
-    // spdlog::info("Ray bbox check on ray {}, BBox {}, mint {}", *this, bbox,
-    //              max_t);
+    Rational max_t = isect.has_value()
+                         ? isect->t
+                         : Rational(std::numeric_limits<double>::max());
+    const Point p = ray.origin;
     if (contains(p)) {
         return true;
     } else {
@@ -42,15 +40,12 @@ bool Box::intersect(const Ray& ray, std::optional<Intersection>& isect) const {
                 }
             }
             Rational t = (target - ray.origin(a)) / ray.direction(a);
-            // spdlog::info("plane got a t of {}", t);
 
             if (t > max_t) {
-                // spdlog::info("Mint fail");
                 return false;
             } else {
                 Rational bp = ray.direction(b) * t + ray.origin(b);
                 Rational cp = ray.direction(c) * t + ray.origin(c);
-                // spdlog::info("Got bc = {} {}", bp, cp);
 
                 if (min()(b) >= bp || max()(b) <= bp) {
                     return false;
@@ -87,8 +82,8 @@ bool Box::intersect(const Ray& ray, std::optional<Intersection>& isect) const {
                     isect->normal = -zipper::VectorBase(
                         zipper::views::nullary::unit_vector<double, 3>(a));
                 }
+                return true;
             }
-            return true;
         };
 
         const bool c0 = check(0, 1, 2);
@@ -97,6 +92,10 @@ bool Box::intersect(const Ray& ray, std::optional<Intersection>& isect) const {
         return c0 || c1 || c2;
     }
     return true;
+}
+bool Box::intersect(const Ray& ray) const {
+    std::optional<Intersection> isec;
+    return intersect(ray, isec);
 }
 
 Box& Box::expand(const Box& bb) {
@@ -113,7 +112,6 @@ Box& Box::expand(const Point& p) {
     }
     _min = Point(nmin[0], nmin[1], nmin[2]);
     _max = Point(nmax[0], nmax[1], nmax[2]);
-    spdlog::info("child {} {}", min(), max());
     return *this;
 }
 

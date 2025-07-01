@@ -1,20 +1,20 @@
 #pragma once
-#include "art/objects/Object.hpp"
+#include "art/objects/SceneNode.hpp"
 
 namespace art::objects {
-class SceneNode : public Object {
+class InternalSceneNode : public SceneNode {
    public:
-    using Ptr = std::shared_ptr<SceneNode>;
-    SceneNode() {}
-    void add_node(Object::Ptr);
-    void update_bbox() override;
-    bool intersect(const geometry::Ray& ray,
+    using Ptr = std::shared_ptr<InternalSceneNode>;
+    InternalSceneNode() {}
+    void add_node(SceneNode::Ptr);
+    void update_bounding_box() override;
+    bool intersect(const Ray& ray,
                    std::optional<Intersection>& isect) const override;
 
     static Ptr create();
 
    private:
-    std::vector<Object::Ptr> _children;
+    std::vector<SceneNode::Ptr> _children;
     //AffineTransform _transform;
 };
 }  // namespace art::objects

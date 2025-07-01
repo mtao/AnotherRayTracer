@@ -41,7 +41,9 @@ lib_sources = [
     ,'src/geometry/Box.cpp'
     ,'src/geometry/Sphere.cpp'
 
-    #,'src/objects/SceneNode.cpp'
+    ,'src/objects/SceneNode.cpp'
+    ,'src/objects/InternalSceneNode.cpp'
+    ,'src/objects/Object.cpp'
 
     ,'src/Camera.cpp'
     ,'src/geometry/Line.cpp'
@@ -56,7 +58,7 @@ art_lib = library('art', lib_sources, include_directories: include_dirs, depende
 art_dep = declare_dependency(link_with: art_lib, dependencies: required_deps, include_directories: include_dirs)
 
 
-#art_exec = executable('art', 'src/main.cpp', dependencies: [art_dep] + internal_deps)
+art_exec = executable('art', 'src/main.cpp', dependencies: [art_dep] + internal_deps)
 
 
 if get_option('testing')
