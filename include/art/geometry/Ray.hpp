@@ -1,7 +1,7 @@
 #pragma once
 #include "art/Intersection.hpp"
-#include "art/geometry/BoundingBox.hpp"
 #include "art/Point.hpp"
+#include "art/geometry/BoundingBox.hpp"
 
 namespace art::geometry {
 struct Ray {
@@ -14,4 +14,5 @@ struct Ray {
                    const std::optional<Intersection>& isect) const;
     Point operator()(const Rational& t) const;
 };
+std::string format_as(const Ray& r);
 }  // namespace art::geometry

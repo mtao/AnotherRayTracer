@@ -22,4 +22,5 @@ class BoundingBox {
     Point _min;
     Point _max;
 };
+std::string format_as(const BoundingBox& bbox);
 }  // namespace art::geometry

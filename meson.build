@@ -48,6 +48,7 @@ lib_sources = [
 
 include_dirs = [include_directories('include')]
 
+
 art_lib = library('art', lib_sources, include_directories: include_dirs, dependencies: internal_deps)
 art_dep = declare_dependency(link_with: art_lib, dependencies: required_deps, include_directories: include_dirs)
 

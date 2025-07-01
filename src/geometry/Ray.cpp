@@ -1,10 +1,16 @@
 #include "art/geometry/Ray.hpp"
 namespace art::geometry {
+
+std::string format_as(const Ray& r) {
+    return fmt::format("Ray[{}+t{}]", r.origin, r.direction);
+}
 Point Ray::operator()(const Rational& t) const {
     return origin + Point(t.numerator * direction, t.denominator);
 }
 bool Ray::hits_bbox(const BoundingBox& bbox, const Rational& min_t) const {
     const Point p = (*this)(min_t);
+    // spdlog::info("Ray bbox check on ray {}, BBox {}, mint {}", *this, bbox,
+    //              min_t);
     if (bbox.contains(p)) {
         return true;
     } else {
@@ -14,27 +20,34 @@ bool Ray::hits_bbox(const BoundingBox& bbox, const Rational& min_t) const {
             Rational target;
             if (direction(a) < 0) {
                 target = bbox.max()(a);
-                if (target < o) {
+                // if the target plane  requires going forward (direction is
+                // negative)
+                if (target > o) {
                     return false;
                 }
             } else {
                 target = bbox.min()(a);
-                if (target > o) {
-                    return true;
+                // if the target plane requires going back (direction is
+                // positive)
+                if (target < o) {
+                    return false;
                 }
             }
             Rational t = (target - origin(a)) / direction(a);
+            // spdlog::info("plane got a t of {}", t);
 
             if (t < min_t) {
+                // spdlog::info("Mint fail");
                 return false;
             } else {
                 Rational bp = direction(b) * t + origin(b);
+                Rational cp = direction(c) * t + origin(c);
+                // spdlog::info("Got bc = {} {}", bp, cp);
 
-                if (bbox.min()(b) >= bp || bbox.max()(b) >= bp) {
+                if (bbox.min()(b) >= bp || bbox.max()(b) <= bp) {
                     return false;
                 }
-                Rational cp = direction(c) * t + origin(c);
-                if (bbox.min()(c) >= cp || bbox.max()(c) >= cp) {
+                if (bbox.min()(c) >= cp || bbox.max()(c) <= cp) {
                     return false;
                 }
             }
@@ -42,7 +55,10 @@ bool Ray::hits_bbox(const BoundingBox& bbox, const Rational& min_t) const {
             return true;
         };
 
-        return check(0, 1, 2) || check(1, 0, 2) || check(2, 0, 1);
+        const bool c0 = check(0, 1, 2);
+        const bool c1 = check(1, 0, 2);
+        const bool c2 = check(2, 1, 0);
+        return c0 || c1 || c2;
     }
     return true;
 }

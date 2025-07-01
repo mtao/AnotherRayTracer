@@ -9,10 +9,8 @@ void SceneNode::update_bbox() {
     geometry::BoundingBox bbox;
     for (auto&& c : _children) {
         c->update_bbox();
-        spdlog::info("child {} {}", c->bbox().min(), c->bbox().max());
         bbox.expand(c->bbox());
     }
-    spdlog::info("{} {}", bbox.min(), bbox.max());
     set_bbox(bbox);
 }
 void SceneNode::add_node(Object::Ptr node) {

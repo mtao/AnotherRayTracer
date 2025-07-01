@@ -4,6 +4,8 @@
 
 #include <string>
 
+#include "internal/common.hpp"
+
 namespace art {
 struct Rational {
     double numerator = 0;
@@ -48,31 +50,7 @@ struct Rational {
                (numerator < 0 && denominator < 0);
     }
 
-    inline std::partial_ordering operator<=>(const Rational& o) const {
-        const bool zero = numerator == 0;
-        const bool ozero = o.numerator == 0;
-        spdlog::info("{} {}", zero,ozero);
-        if (zero && ozero) {
-            return std::partial_ordering::equivalent;
-        } else if (zero) {
-            return o.positive()
-                       //
-                       ? std::partial_ordering::less
-                       : std::partial_ordering::greater;
-        } else if (ozero) {
-            return positive()
-                       //
-
-                       ? std::partial_ordering::less
-                       : std::partial_ordering::greater;
-            //? std::partial_ordering::greater
-            //: std::partial_ordering::less;
-        } else {
-            spdlog::info("{} {} {} {} {}",numerator,o.denominator,denominator,o.numerator,numerator * o.denominator <=> denominator * o.numerator == 0);
-            //spdlog::info("{} {}", *this, o);
-            return numerator * o.denominator <=> denominator * o.numerator;
-        }
-    }
+    std::weak_ordering operator<=>(const Rational& o) const;
 
     inline bool operator==(const Rational& o) const {
         return std::is_eq(*this <=> o);
@@ -93,9 +71,7 @@ struct Rational {
     }
 };
 
-inline auto format_as(const Rational& a) {
-    return fmt::format("Rational[{}/{}]", a.numerator, a.denominator);
-}
+std::string format_as(const Rational& a);
 
 Rational min(const Rational& a, const Rational& b);
 Rational max(const Rational& a, const Rational& b);
@@ -103,3 +79,7 @@ Rational clamp(const Rational& v, const Rational& lower, const Rational& upper);
 Rational sqrt(const Rational& r);
 
 }  // namespace art
+
+#if !defined(ART_REDUCE_INLINING)
+#include "Rational.hxx"
+#endif

@@ -42,7 +42,6 @@ TEST_CASE("test_rational", "[rational]") {
             CHECK(a > b);
             CHECK(b < a);
         }
-        continue;
         for (const auto& b : negone) {
             CHECK(a > b);
             CHECK(b < a);
