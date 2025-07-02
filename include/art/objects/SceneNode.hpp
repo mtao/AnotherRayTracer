@@ -4,6 +4,7 @@
 
 #include "art/Intersection.hpp"
 #include "art/geometry/Box.hpp"
+#include "art/utils/AffineTransform.hpp"
 
 namespace art {
 class Ray;
@@ -25,5 +26,6 @@ class SceneNode {
 
    private:
     geometry::Box _bounding_box;
+    utils::AffineTransform _transform;
 };
 }  // namespace art::objects

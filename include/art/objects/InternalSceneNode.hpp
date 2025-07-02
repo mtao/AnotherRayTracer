@@ -15,6 +15,5 @@ class InternalSceneNode : public SceneNode {
 
    private:
     std::vector<SceneNode::Ptr> _children;
-    //AffineTransform _transform;
 };
 }  // namespace art::objects
