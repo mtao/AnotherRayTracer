@@ -21,6 +21,9 @@ class SceneNode {
 
     bool intersects_bounding_box(const Ray& ray) const;
 
+    bool transform_and_intersect(const Ray& ray,
+                                 std::optional<Intersection>& isect) const;
+
     virtual bool intersect(const Ray& ray,
                            std::optional<Intersection>& isect) const = 0;
 

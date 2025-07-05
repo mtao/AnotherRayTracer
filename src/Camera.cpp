@@ -29,8 +29,10 @@ utils::AffineTransform Camera::perspective(const Rational& fovy,
                                            const Rational& aspect,
                                            const Rational& zNear,
                                            const Rational& zFar) {
-    utils::AffineTransform R;
+    utils::AffineTransform R = zipper::views::nullary::ConstantView<double>(0);
 
+    // TODO: try to recall where this commented impl of perspective comes from, equation seems nice but would like to verfiy
+    /*
     Rational ymax = std::tan(double(fovy) * M_PI / 360.) * zNear;
     Rational xmax = ymax * aspect;
 
@@ -44,6 +46,15 @@ utils::AffineTransform Camera::perspective(const Rational& fovy,
     R(2, 2) = double((-zNear - zFar) / temp3);
     R(2, 3) = double(-temp * zFar / temp3);
     R(3, 2) = -1.;
+    */
+    // https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/gluPerspective.xml
+    double f = atan(double(fovy/2.0));
+    R(0, 0) = double(f / aspect);
+    R(1, 1) = double(f);
+    R(2, 2) = double((zFar + zNear) / (zNear - zFar));
+    R(3, 2) = -1;
+    R(2, 3) = double(2 * zFar * zNear / (zNear - zFar));
+
     return R;
 }
 Image Camera::render(size_t nx, size_t ny, objects::SceneNode& node) const {
