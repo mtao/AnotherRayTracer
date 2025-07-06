@@ -10,7 +10,6 @@ Box Sphere::bounding_box() const {
 bool Sphere::intersect(const Ray& ray,
                        std::optional<Intersection>& isect) const {
     const auto& d = ray.direction;
-    // spdlog::info("{} + t [{}]", std::string(ray.origin), fmt::join(d, ","));
     Rational a = ray.direction.norm_powered<2>();
     Rational b(2 * ray.origin.numerator().dot(d), ray.origin.denominator());
     Rational c = ray.origin.squaredNorm() - radius * radius;

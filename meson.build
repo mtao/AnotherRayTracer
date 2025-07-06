@@ -45,6 +45,8 @@ lib_sources = [
     ,'src/objects/InternalSceneNode.cpp'
     ,'src/objects/Object.cpp'
 
+    ,'src/utils/AffineTransform.cpp'
+
     ,'src/Camera.cpp'
     ,'src/geometry/Line.cpp'
     ,'src/Rational.cpp'

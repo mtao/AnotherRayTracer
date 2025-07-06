@@ -1,6 +1,5 @@
 #include "art/objects/InternalSceneNode.hpp"
 
-#include <spdlog/spdlog.h>
 
 namespace art::objects {
 
@@ -14,7 +13,6 @@ void InternalSceneNode::update_bounding_box() {
         // TODO: update coordinate system
         bounding_box.expand(c->bounding_box());
     }
-    spdlog::info("{}", bounding_box);
     set_bounding_box(bounding_box);
 }
 void InternalSceneNode::add_node(SceneNode::Ptr node) {
@@ -22,16 +20,13 @@ void InternalSceneNode::add_node(SceneNode::Ptr node) {
     set_bounding_box(
         geometry::Box(bounding_box()).expand(node->bounding_box()));
 }
-bool InternalSceneNode::intersect(const Ray& ray,
-                                  std::optional<Intersection>& isect) const {
-    if (intersects_bounding_box(ray)) {
-        bool succ = false;
-        // TODO: update coordinate system
-        for (auto&& c : _children) {
-            succ |= c->intersect(ray, isect);
-        }
-        return succ;
+bool InternalSceneNode::intersect_direct(
+    const Ray& ray, std::optional<Intersection>& isect) const {
+    bool succ = false;
+    // TODO: update coordinate system
+    for (auto&& c : _children) {
+        succ |= c->intersect(ray, isect);
     }
-    return false;
+    return succ;
 }
 }  // namespace art::objects

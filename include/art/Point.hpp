@@ -7,7 +7,11 @@ struct Point : public Vector4d {
     using Base = Vector4d;
     Point() = default;
     Point(const Base& v) : Base(v) {}
+    // returns a piont where all values are the same
     static Point Constant(const Rational& r);
+    // returns a piont where all values are the same - might be redundant with
+    // Rational
+    static Point Constant(double r);
     // Point(const Vector3d& v) : Base(v.homogeneous()) {}
     template <zipper::concepts::VectorBaseDerived V>
         requires(V::extents_type::static_extent(0) == 3)
@@ -24,6 +28,14 @@ struct Point : public Vector4d {
     Point(const Rational& a, const Rational& b, const Rational& c);
     Point(const Point&) = default;
     Point(Point&&) = default;
+
+    // all coordinates are set to +inf
+    static Point max_position();
+    static Point lowest_position();
+    // all coordinates are set to +inf
+    static Point infinity_position();
+    // all coordinates are set to -inf
+    static Point negative_infinity_position();
 
     Rational operator()(size_t index) const {
         return { Base::operator()(index), Base::operator()(3) };

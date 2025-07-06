@@ -15,20 +15,26 @@ class SceneNode {
     using Ptr = std::shared_ptr<SceneNode>;
     const geometry::Box& bounding_box() const { return _bounding_box; }
     virtual void update_bounding_box() = 0;
-    void set_bounding_box(const geometry::Box& bounding_box) {
-        _bounding_box = bounding_box;
-    }
 
     bool intersects_bounding_box(const Ray& ray) const;
 
-    bool transform_and_intersect(const Ray& ray,
-                                 std::optional<Intersection>& isect) const;
+    // Transforms a ray to this node's local space and does a bounding box check
+    // The bounding box is defined in the local space
+    bool intersect(const Ray& ray, std::optional<Intersection>& isect) const;
 
-    virtual bool intersect(const Ray& ray,
-                           std::optional<Intersection>& isect) const = 0;
+    //
+    virtual bool intersect_direct(const Ray& ray,
+                                  std::optional<Intersection>& isect) const = 0;
+
+    const utils::AffineTransform& transform() const { return _transform; }
+    utils::AffineTransform& transform() { return _transform; }
+
+   protected:
+    void set_bounding_box(const geometry::Box& bounding_box);
 
    private:
-    geometry::Box _bounding_box;
+    geometry::Box _bounding_box = geometry::Box(
+        Point::infinity_position(), Point::negative_infinity_position());
     utils::AffineTransform _transform;
 };
 }  // namespace art::objects

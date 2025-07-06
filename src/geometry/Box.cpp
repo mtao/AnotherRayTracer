@@ -93,6 +93,7 @@ bool Box::intersect(const Ray& ray, std::optional<Intersection>& isect) const {
     }
     return true;
 }
+
 bool Box::intersect(const Ray& ray) const {
     std::optional<Intersection> isec;
     return intersect(ray, isec);

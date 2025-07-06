@@ -12,10 +12,11 @@ class Object : public SceneNode {
     using Ptr = std::shared_ptr<Object>;
     Object(const geometry::Geometry& geometry);
     ~Object();
-    void update_bounding_box() override;
-    bool intersect(const Ray& ray,
-                   std::optional<Intersection>& isect) const override;
+    void update_bounding_box() final override;
+    bool intersect_direct(const Ray& ray, std::optional<Intersection>& isect)
+        const final override;
 
+    const geometry::Geometry& geometry() const { return *_geometry; }
     // static Ptr create();
 
    private:

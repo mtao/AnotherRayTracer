@@ -11,15 +11,12 @@ Object::~Object() = default;
 void Object::update_bounding_box() {
     set_bounding_box(_geometry->bounding_box());
 }
-bool Object::intersect(const Ray& ray,
-                       std::optional<Intersection>& isect) const {
-    if (intersects_bounding_box(ray)) {
-        if (_geometry->intersect(ray, isect)) {
-            // TODO: fill in materials
-            return true;
-        }
-    }
-    return false;
+bool Object::intersect_direct(const Ray& ray,
+                              std::optional<Intersection>& isect) const {
+    bool did_intersect = _geometry->intersect(ray, isect);
+
+    // fill in material properties or whatnot
+    return did_intersect;
 }
 
 // static Ptr create();
