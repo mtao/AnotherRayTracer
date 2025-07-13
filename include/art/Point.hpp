@@ -13,12 +13,6 @@ struct Point : public Vector4d {
     // Rational
     static Point Constant(double r);
     // Point(const Vector3d& v) : Base(v.homogeneous()) {}
-    template <zipper::concepts::VectorBaseDerived V>
-        requires(V::extents_type::static_extent(0) == 3)
-    Point(const V& v, double denom = 1.) {
-        numerator() = v;
-        denominator() = denom;
-    }
     Point(double a, double b, double c, double denom = 1.) {
         Base::operator()(0) = a;
         Base::operator()(1) = b;
@@ -48,6 +42,12 @@ struct Point : public Vector4d {
 
     const Vector4d& homogeneous() const { return *this; }
     Vector4d& homogeneous() { return *this; }
+    template <zipper::concepts::VectorBaseDerived V>
+        requires(V::extents_type::static_extent(0) == 3)
+    Point(const V& v, double denom = 1.) {
+        numerator() = v;
+        denominator() = denom;
+    }
 
     Point& operator=(const Point& o) {
         // TODO: why can't this be default
