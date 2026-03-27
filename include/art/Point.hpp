@@ -4,98 +4,64 @@
 #include "art/zipper_types.hpp"
 
 namespace art {
-struct ART_API Point : public Vector4d {
-    using Base = Vector4d;
+class ART_API Point {
+   public:
     Point() = default;
-    Point(const Base& v) : Base(v) {}
-    // returns a piont where all values are the same
-    static Point Constant(const Rational& r);
-    // returns a piont where all values are the same - might be redundant with
-    // Rational
-    static Point Constant(double r);
-    // Point(const Vector3d& v) : Base(v.homogeneous()) {}
-    Point(double a, double b, double c, double denom = 1.) {
-        Base::operator()(0) = a;
-        Base::operator()(1) = b;
-        Base::operator()(2) = c;
-        Base::operator()(3) = denom;
-    }
+    Point(const Vector4d& v);
+    Point(double a, double b, double c, double denom = 1.);
     Point(const Rational& a, const Rational& b, const Rational& c);
-    Point(const Point&) = default;
-    Point(Point&&) = default;
-
-    // all coordinates are set to +inf
-    static Point max_position();
-    static Point lowest_position();
-    // all coordinates are set to +inf
-    static Point infinity_position();
-    // all coordinates are set to -inf
-    static Point negative_infinity_position();
-
-    Rational operator()(size_t index) const {
-        return { Base::operator()(index), Base::operator()(3) };
-    }
-
-    auto numerator() { return Base::head<3>(); }
-    auto numerator() const { return Base::head<3>(); }
-    double& denominator() { return Base::operator()(3); }
-    double denominator() const { return Base::operator()(3); }
-
-    const Vector4d& homogeneous() const { return *this; }
-    Vector4d& homogeneous() { return *this; }
     template <zipper::concepts::Vector V>
         requires(V::extents_type::static_extent(0) == 3)
-    Point(const V& v, double denom = 1.) {
-        numerator() = v;
-        denominator() = denom;
-    }
-
-    Point& operator=(const Point& o) {
-        // TODO: why can't this be default
-        *this = o.homogeneous();
-        return *this;
-    }
+    Point(const V& v, double denom = 1.);
+    Point(const Point&) = default;
+    Point(Point&&) = default;
+    Point& operator=(const Point&) = default;
     Point& operator=(Point&&) = default;
-    inline Point operator+(const Point& o) const {
-        return Point(
-            numerator() * o.denominator() + denominator() * o.numerator(),
-            denominator() * o.denominator());
-    }
-    inline Point operator-() const {
-        Point r = *this;
-        r.denominator() = -denominator();
-        return r;
-    }
-    inline Point operator-(const Point& o) const {
-        return Point(
-            numerator() * o.denominator() - denominator() * o.numerator(),
-            denominator() * o.denominator());
-    }
-    inline Point operator*(const Rational& o) const {
-        return Point(numerator() * o.numerator, denominator() * o.denominator);
-    }
 
-    inline Point operator/(const Rational& o) const {
-        return Point(numerator() * o.denominator, denominator() * o.numerator);
-    }
-    inline bool operator==(const Point& o) const {
-        return numerator() * o.denominator() == denominator() * o.numerator();
-    }
+    // Element access — returns Rational{m_data(i), m_data(3)}
+    Rational operator()(size_t index) const;
 
-    inline Point cross(const Point& o) const {
-        return Point(numerator().cross(o.numerator()),
-                     denominator() * o.denominator());
-    }
+    // Structured access — VectorBase views
+    auto numerator();
+    auto numerator() const;
+    double& denominator();
+    double denominator() const;
 
-    Rational squaredNorm() const {
-        return {numerator().norm_powered<2>(), denominator() * denominator()};
-    }
+    // Underlying 4-vector (for affine transforms)
+    const Vector4d& homogeneous() const;
+    Vector4d& homogeneous();
 
-    Rational norm() const { return {numerator().norm(), denominator()}; }
-
-    operator Vector3d() const { return numerator() / denominator(); }
+    // Conversion
+    operator Vector3d() const;
     operator std::string() const;
+
+    // Static factories
+    // Returns a point where all numerator values are the same
+    static Point Constant(const Rational& r);
+    static Point Constant(double r);
+    static Point max_position();
+    static Point lowest_position();
+    // All coordinates set to +inf
+    static Point infinity_position();
+    // All coordinates set to -inf
+    static Point negative_infinity_position();
+
+    // Member operations
+    Rational squaredNorm() const;
+    Rational norm() const;
+    Point cross(const Point& o) const;
+
+   private:
+    Vector4d m_data;
 };
+
+// Free-function arithmetic (rational/homogeneous semantics)
+ART_API Point operator+(const Point& a, const Point& b);
+ART_API Point operator-(const Point& a);
+ART_API Point operator-(const Point& a, const Point& b);
+ART_API Point operator*(const Point& a, const Rational& r);
+ART_API Point operator/(const Point& a, const Rational& r);
+ART_API bool operator==(const Point& a, const Point& b);
 
 inline auto format_as(const Point& a) { return std::string(a); }
 
@@ -107,3 +73,7 @@ struct std::formatter<art::Point> : std::formatter<std::string> {
         return std::formatter<std::string>::format(std::string(p), ctx);
     }
 };
+
+#if !defined(ART_REDUCE_INLINING)
+#include "Point.hxx"
+#endif
