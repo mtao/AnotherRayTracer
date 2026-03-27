@@ -5,7 +5,6 @@ project('AnotherRayTracer', 'cpp',
 
 
 # min versions
-fmt_version = '>=8.0.1'
 spdlog_version = '>=1.9.2'
 
 
@@ -13,8 +12,6 @@ spdlog_version = '>=1.9.2'
 cc = meson.get_compiler('cpp')
 dl_lib = cc.find_library('dl')
 
-
-fmt_dep = dependency('fmt', version: fmt_version)
 
 spdlog_dep = dependency('spdlog', version: spdlog_version, default_options: ['tests=disabled'])
 
@@ -24,7 +21,7 @@ zipper_dep = zipper_proj.get_variable('zipper_dep')
 TBB_dep = dependency('tbb')
 
 required_deps = [zipper_dep]
-internal_deps = [spdlog_dep, fmt_dep] + required_deps
+internal_deps = [spdlog_dep] + required_deps
 
 lib_sources = [
     'src/Point.cpp'
@@ -35,8 +32,6 @@ lib_sources = [
     ,'src/objects/SceneNode.cpp'
     ,'src/objects/InternalSceneNode.cpp'
     ,'src/objects/Object.cpp'
-
-    ,'src/utils/AffineTransform.cpp'
 
     ,'src/Camera.cpp'
     ,'src/geometry/Line.cpp'

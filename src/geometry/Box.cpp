@@ -1,13 +1,14 @@
 #include "art/geometry/Box.hpp"
 
 #include <array>
-#include <zipper/views/nullary/UnitView.hpp>
+#include <format>
+#include <zipper/expression/nullary/Unit.hpp>
 
 #include "art/Ray.hpp"
 namespace art::geometry {
 
 std::string format_as(const Box& r) {
-    return fmt::format("Box[{}:{}]", r.min(), r.max());
+    return std::format("Box[{}:{}]", std::string(r.min()), std::string(r.max()));
 }
 
 Box Box::bounding_box() const { return *this; }
@@ -77,10 +78,10 @@ bool Box::intersect(const Ray& ray, std::optional<Intersection>& isect) const {
                 }
                 if (from_above) {
                     isect->normal =
-                        zipper::views::nullary::unit_vector<double, 3>(a);
+                        zipper::expression::nullary::unit_vector<double, 3>(a);
                 } else {
-                    isect->normal = -zipper::VectorBase(
-                        zipper::views::nullary::unit_vector<double, 3>(a));
+                    isect->normal = -Vector3d(
+                        zipper::expression::nullary::unit_vector<double, 3>(a));
                 }
                 return true;
             }

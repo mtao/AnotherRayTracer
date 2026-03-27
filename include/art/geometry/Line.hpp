@@ -1,12 +1,13 @@
 #pragma once
 #include "art/zipper_types.hpp"
+#include "art/export.hpp"
 #include "art/Point.hpp"
 #include "art/Rational.hpp"
 
 namespace art {
     // Representation of a line using Plucker coordinates
     // I'm new to Plucker coordinates, but my hope is that it'll present an easier 
-struct Line : public Vector6d {
+struct ART_API Line : public Vector6d {
     using Base = Vector6d;
     Line() = default;
     Line(const Base& v) : Base(v) {}

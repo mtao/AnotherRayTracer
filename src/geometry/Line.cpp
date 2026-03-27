@@ -1,6 +1,6 @@
 #include "art/geometry/Line.hpp"
-#include <fmt/format.h>
-#include <zipper/utils/maxCoeff.hpp>
+#include <format>
+#include <zipper/utils/max_coeff.hpp>
 
 namespace art {
 Rational Line::distance(const Point& p) const {
@@ -61,12 +61,12 @@ double Line::reciprocalProduct(const Line& l) const {
     }
 
 Line::operator std::string() const {
-   return fmt::format("Line(mom={},{},{};dir={},{},{})",
-           moment()(0),
-           moment()(1),
-           moment()(2),
-           direction()(0),
-           direction()(1),
-           direction()(2));
+   return std::format("Line(mom={},{},{};dir={},{},{})",
+           double(moment()(0)),
+           double(moment()(1)),
+           double(moment()(2)),
+           double(direction()(0)),
+           double(direction()(1)),
+           double(direction()(2)));
 }
 }  // namespace art

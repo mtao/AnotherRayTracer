@@ -1,9 +1,10 @@
 #pragma once
+#include "art/export.hpp"
 #include "art/geometry/Geometry.hpp"
 
 namespace art::geometry {
 // A unit sphere stored at the origin
-class Sphere : public Geometry {
+class ART_API Sphere : public Geometry {
    public:
     Box bounding_box() const override;
     bool intersect(const Ray& ray,

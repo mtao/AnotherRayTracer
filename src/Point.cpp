@@ -1,9 +1,9 @@
 #include "art/Point.hpp"
 
-#include <fmt/format.h>
-#include <fmt/ranges.h>
+#include <format>
+#include <sstream>
 
-#include <zipper/views/nullary/ConstantView.hpp>
+#include <zipper/expression/nullary/Constant.hpp>
 
 namespace art {
 Point Point::max_position() {
@@ -20,7 +20,7 @@ Point Point::negative_infinity_position() {
 }
 Point Point::Constant(const Rational& r) {
     Point p;
-    p.numerator() = zipper::views::nullary::ConstantView(r.numerator);
+    p.numerator() = zipper::expression::nullary::Constant(r.numerator);
     p.denominator() = r.denominator;
     return p;
 }
@@ -56,7 +56,8 @@ Point::Point(const Rational& a, const Rational& b, const Rational& c) {
     }
 }
 Point::operator std::string() const {
-    return fmt::format("P[({})/{}]", fmt::join(numerator().eval(), " "),
+    auto n = numerator().eval();
+    return std::format("P[({} {} {})/{}]", n(0), n(1), n(2),
                        denominator());
 }
 }  // namespace art

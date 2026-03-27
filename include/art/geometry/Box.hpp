@@ -3,10 +3,11 @@
 #include "Geometry.hpp"
 #if !defined(ART_GEOMETRY_BOX_HPP)
 #define ART_GEOMETRY_BOX_HPP
+#include "art/export.hpp"
 #include "art/Point.hpp"
 
 namespace art::geometry {
-class Box : public Geometry {
+class ART_API Box : public Geometry {
    public:
     Box(const Point& min, const Point& max) : _min(min), _max(max) {}
     // creates a unit box centered at the origin
@@ -35,6 +36,6 @@ class Box : public Geometry {
     Point _min = Point::Constant(-0.5);
     Point _max = Point::Constant(0.5);
 };
-std::string format_as(const Box& bbox);
+ART_API std::string format_as(const Box& bbox);
 }  // namespace art::geometry
 #endif

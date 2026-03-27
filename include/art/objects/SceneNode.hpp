@@ -3,6 +3,7 @@
 #include <optional>
 
 #include "art/Intersection.hpp"
+#include "art/export.hpp"
 #include "art/geometry/Box.hpp"
 #include "art/utils/AffineTransform.hpp"
 
@@ -10,7 +11,7 @@ namespace art {
 class Ray;
 }
 namespace art::objects {
-class SceneNode {
+class ART_API SceneNode {
    public:
     using Ptr = std::shared_ptr<SceneNode>;
     const geometry::Box& bounding_box() const { return _bounding_box; }

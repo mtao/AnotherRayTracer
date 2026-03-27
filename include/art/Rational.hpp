@@ -1,12 +1,13 @@
 #pragma once
-#include <fmt/format.h>
 
+#include <format>
 #include <string>
 
+#include "art/export.hpp"
 #include "internal/common.hpp"
 
 namespace art {
-struct Rational {
+struct ART_API Rational {
     double numerator = 0;
     double denominator = 1;
     Rational() = default;
@@ -70,12 +71,10 @@ struct Rational {
     }
 };
 
-std::string format_as(const Rational& a);
-
-Rational min(const Rational& a, const Rational& b);
-Rational max(const Rational& a, const Rational& b);
-Rational clamp(const Rational& v, const Rational& lower, const Rational& upper);
-Rational sqrt(const Rational& r);
+ART_API Rational min(const Rational& a, const Rational& b);
+ART_API Rational max(const Rational& a, const Rational& b);
+ART_API Rational clamp(const Rational& v, const Rational& lower, const Rational& upper);
+ART_API Rational sqrt(const Rational& r);
 
 }  // namespace art
 

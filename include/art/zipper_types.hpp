@@ -3,6 +3,8 @@
 #include <zipper/Form.hpp>
 #include <zipper/Matrix.hpp>
 #include <zipper/Vector.hpp>
+#include <zipper/concepts/Matrix.hpp>
+#include <zipper/concepts/Vector.hpp>
 #include <zipper/concepts/shapes.hpp>
 
 namespace art {
@@ -21,11 +23,11 @@ using Matrix3d = Matrix<double, 3, 3>;
 using Matrix4d = Matrix<double, 4, 4>;
 
 template <typename T>
-concept Matrix3x3Like = zipper::concepts::MatrixBaseDerived<T> &&
+concept Matrix3x3Like = zipper::concepts::Matrix<T> &&
                         zipper::concepts::ValidExtents<T, 3, 3>;
 
 template <typename T>
-concept Vector3Like = zipper::concepts::VectorBaseDerived<T> &&
+concept Vector3Like = zipper::concepts::Vector<T> &&
                       zipper::concepts::ValidExtents<T, 3>;
 
 }  // namespace art

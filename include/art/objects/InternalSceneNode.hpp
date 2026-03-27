@@ -1,8 +1,9 @@
 #pragma once
+#include "art/export.hpp"
 #include "art/objects/SceneNode.hpp"
 
 namespace art::objects {
-class InternalSceneNode : public SceneNode {
+class ART_API InternalSceneNode : public SceneNode {
    public:
     using Ptr = std::shared_ptr<InternalSceneNode>;
     InternalSceneNode() {}

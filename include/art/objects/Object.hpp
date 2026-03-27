@@ -1,13 +1,14 @@
 #pragma once
 #include <memory>
 
+#include "art/export.hpp"
 #include "art/objects/SceneNode.hpp"
 
 namespace art::geometry {
 class Geometry;
 }
 namespace art::objects {
-class Object : public SceneNode {
+class ART_API Object : public SceneNode {
    public:
     using Ptr = std::shared_ptr<Object>;
     Object(const geometry::Geometry& geometry);

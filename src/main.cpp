@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <zipper/transform/transform.hpp>
+
 #include "art/Camera.hpp"
 #include "art/geometry/Box.hpp"
 #include "art/geometry/Sphere.hpp"
@@ -12,11 +14,6 @@ void sphere() {
                               /*looking_at=*/Point(0, 0, 0),
                               /*up=*/Point(0, 1, 0)));
 
-    // Camera::perspective(
-    //     /*fovy=*/70,
-    //     /*aspect=*/1.,
-    //     /*znear=*/0.1,
-    //     /*zfar=*/10));
     objects::Object sphere(*std::make_shared<geometry::Sphere>());
     sphere.update_bounding_box();
 
@@ -29,15 +26,11 @@ void cube() {
                               /*looking_at=*/Point(0, 0, 0),
                               /*up=*/Point(0, 1, 0)));
 
-    // Camera::perspective(
-    //     /*fovy=*/70,
-    //     /*aspect=*/1.,
-    //     /*znear=*/0.1,
-    //     /*zfar=*/10));
     objects::Object cube(*std::make_shared<geometry::Box>());
 
-    cube.transform() = utils::AffineTransform::axis_angle_rotation(
-        Vector3d({0., 0., 1.}), 1.8);
+    cube.transform() =
+        zipper::transform::AxisAngleRotation<double>(1.8, {0., 0., 1.})
+            .to_transform();
     cube.update_bounding_box();
 
     Image img = cam.render(20, 20, cube);
@@ -49,20 +42,17 @@ void both() {
                               /*looking_at=*/Point(0, 0, 0),
                               /*up=*/Point(0, 1, 0)));
 
-    // Camera::perspective(
-    //     /*fovy=*/70,
-    //     /*aspect=*/1.,
-    //     /*znear=*/0.1,
-    //     /*zfar=*/10));
     auto cube =
         std::make_shared<objects::Object>(*std::make_shared<geometry::Box>());
     auto sphere = std::make_shared<objects::Object>(
         *std::make_shared<geometry::Sphere>());
 
     cube->transform() =
-        utils::AffineTransform::translation(Vector3d({0., 1., 0.}));
+        zipper::transform::Translation<double>(Vector3d({0., 1., 0.}))
+            .to_transform();
     sphere->transform() =
-        utils::AffineTransform::translation(Vector3d({0., -1., 0.}));
+        zipper::transform::Translation<double>(Vector3d({0., -1., 0.}))
+            .to_transform();
 
     auto scene = std::make_shared<objects::InternalSceneNode>();
 

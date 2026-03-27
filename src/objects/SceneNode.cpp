@@ -11,8 +11,9 @@ bool SceneNode::intersects_bounding_box(const Ray& ray) const {
 bool SceneNode::intersect(const Ray& ray,
                           std::optional<Intersection>& isect) const {
     if (intersects_bounding_box(ray)) {
-        Ray r{(_transform.as_matrix() * ray.origin.homogeneous()).eval(),
-              _transform.rotation().transpose() * ray.direction};
+        auto inv = _transform.inverse();
+        Ray r{(inv.to_matrix() * ray.origin.homogeneous()).eval(),
+              inv.linear() * ray.direction};
 
         return intersect_direct(r, isect);
     }
@@ -21,6 +22,5 @@ bool SceneNode::intersect(const Ray& ray,
 void SceneNode::set_bounding_box(const geometry::Box& bounding_box) {
     _bounding_box = bounding_box;
 }
-// static Ptr create();
 
 }  // namespace art::objects

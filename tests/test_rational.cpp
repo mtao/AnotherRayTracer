@@ -1,7 +1,5 @@
 
 
-#include <spdlog/spdlog.h>
-
 #include <art/Rational.hpp>
 #include <catch2/catch_all.hpp>
 

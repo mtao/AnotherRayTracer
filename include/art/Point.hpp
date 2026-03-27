@@ -1,9 +1,10 @@
 #pragma once
 #include "art/Rational.hpp"
+#include "art/export.hpp"
 #include "art/zipper_types.hpp"
 
 namespace art {
-struct Point : public Vector4d {
+struct ART_API Point : public Vector4d {
     using Base = Vector4d;
     Point() = default;
     Point(const Base& v) : Base(v) {}
@@ -42,7 +43,7 @@ struct Point : public Vector4d {
 
     const Vector4d& homogeneous() const { return *this; }
     Vector4d& homogeneous() { return *this; }
-    template <zipper::concepts::VectorBaseDerived V>
+    template <zipper::concepts::Vector V>
         requires(V::extents_type::static_extent(0) == 3)
     Point(const V& v, double denom = 1.) {
         numerator() = v;
@@ -99,3 +100,10 @@ struct Point : public Vector4d {
 inline auto format_as(const Point& a) { return std::string(a); }
 
 }  // namespace art
+
+template <>
+struct std::formatter<art::Point> : std::formatter<std::string> {
+    auto format(const art::Point& p, auto& ctx) const {
+        return std::formatter<std::string>::format(std::string(p), ctx);
+    }
+};

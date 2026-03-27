@@ -1,7 +1,5 @@
 
 
-#include <spdlog/spdlog.h>
-
 #include <catch2/catch_all.hpp>
 #include <art/Point.hpp>
 
