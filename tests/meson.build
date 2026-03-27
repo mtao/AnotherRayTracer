@@ -1,9 +1,8 @@
+catch2_with_main_dep = dependency('catch2-with-main', default_options: ['tests=false'])
 
-catch2_with_main_dep = dependency('catch2-with-main')
-
-
+art_test_dep = declare_dependency(
+  dependencies: [art_dep, catch2_with_main_dep])
 
 sources = ['test_point.cpp', 'test_rational.cpp']
-test_art = executable('test_art', sources, dependencies: [art_dep,catch2_with_main_dep])
+test_art = executable('test_art', sources, dependencies: [art_test_dep])
 test('art', test_art)
-

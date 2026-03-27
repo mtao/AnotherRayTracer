@@ -1,7 +1,6 @@
 project('AnotherRayTracer', 'cpp',
   version : '0.1',
-  default_options : ['warning_level=3', 'cpp_std=c++23'])
-
+  default_options : ['warning_level=3', 'cpp_std=c++26'])
 
 
 
@@ -17,22 +16,14 @@ dl_lib = cc.find_library('dl')
 
 fmt_dep = dependency('fmt', version: fmt_version)
 
-spdlog_dep = dependency('spdlog', version: spdlog_version)
+spdlog_dep = dependency('spdlog', version: spdlog_version, default_options: ['tests=disabled'])
 
 zipper_proj = subproject('zipper', default_options: {'testing': false, 'examples': false})
 zipper_dep = zipper_proj.get_variable('zipper_dep')
 
-range_v3_dep = dependency('range-v3')
-
-
-
 TBB_dep = dependency('tbb')
 
-
-
-range_v3_dep = dependency('range-v3')
-
-required_deps = [range_v3_dep, zipper_dep]
+required_deps = [zipper_dep]
 internal_deps = [spdlog_dep, fmt_dep] + required_deps
 
 lib_sources = [
@@ -55,9 +46,23 @@ lib_sources = [
 
 include_dirs = [include_directories('include')]
 
+# Header-only dependency (for targets that only need headers)
+art_headers_dep = declare_dependency(
+  dependencies: required_deps,
+  include_directories: include_dirs)
 
-art_lib = library('art', lib_sources, include_directories: include_dirs, dependencies: internal_deps)
-art_dep = declare_dependency(link_with: art_lib, dependencies: required_deps, include_directories: include_dirs)
+# Compiled library
+art_lib = library('art', lib_sources,
+  include_directories: include_dirs,
+  dependencies: internal_deps,
+  cpp_args: ['-DART_EXPORTS'],
+  gnu_symbol_visibility: 'hidden')
+
+# Full dependency (headers + library linking)
+art_dep = declare_dependency(
+  link_with: art_lib,
+  dependencies: required_deps,
+  include_directories: include_dirs)
 
 
 art_exec = executable('art', 'src/main.cpp', dependencies: [art_dep] + internal_deps)
