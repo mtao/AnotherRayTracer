@@ -1,2 +1,3 @@
 option('testing', type : 'boolean', value : true, description : 'Enable tests')
 option('examples', type : 'boolean', value : true, description : 'Build examples')
+option('viewer', type : 'boolean', value : false, description : 'Build viewer tool via balsa::visualization')
