@@ -1,14 +1,14 @@
 #include "art/Camera.hpp"
 
-#include <iostream>
 #include <zipper/transform/transform.hpp>
 
 #include "art/Ray.hpp"
 #include "art/utils/AffineTransform.hpp"
 namespace art {
 
-utils::Isometry Camera::lookAt(const Point& position, const Point& target,
-                                const Point& up) {
+utils::Isometry Camera::lookAt(const Point &position,
+                               const Point &target,
+                               const Point &up) {
     // Convert Points to Vector3d (divides numerator by denominator)
     Vector3d eye = position;
     Vector3d center = target;
@@ -16,7 +16,9 @@ utils::Isometry Camera::lookAt(const Point& position, const Point& target,
     return zipper::transform::look_at(eye, center, up_vec);
 }
 
-Image Camera::render(size_t nx, size_t ny, objects::SceneNode& node) const {
+Image Camera::render(size_t nx, size_t ny, objects::SceneNode &node) const {
+    Image image(nx, ny);
+
     Ray ray;
     ray.origin = Point(0, 0, 0);
 
@@ -38,13 +40,15 @@ Image Camera::render(size_t nx, size_t ny, objects::SceneNode& node) const {
 
             std::optional<Intersection> isect;
             if (node.intersect(ray, isect)) {
-                std::cout << "o";
+                // White for hits (until materials/lights exist)
+                image.set_pixel(i, j, 1.f, 1.f, 1.f, 1.f);
             } else {
-                std::cout << ".";
+                // Black for misses
+                image.set_pixel(i, j, 0.f, 0.f, 0.f, 1.f);
             }
+            image.increment_progress();
         }
-        std::cout << std::endl;
     }
-    return {};
+    return image;
 }
-}  // namespace art
+} // namespace art

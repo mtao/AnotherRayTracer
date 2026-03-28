@@ -23,6 +23,23 @@ TBB_dep = dependency('tbb')
 required_deps = [zipper_dep]
 internal_deps = [spdlog_dep] + required_deps
 
+# Optional image I/O dependencies
+io_cpp_args = []
+
+if get_option('exr')
+  tinyexr_proj = subproject('tinyexr')
+  tinyexr_dep = tinyexr_proj.get_variable('tinyexr_dep')
+  internal_deps += tinyexr_dep
+  io_cpp_args += '-DART_HAS_EXR=1'
+endif
+
+if get_option('png')
+  stb_proj = subproject('stb')
+  stb_dep = stb_proj.get_variable('stb_dep')
+  internal_deps += stb_dep
+  io_cpp_args += '-DART_HAS_PNG=1'
+endif
+
 lib_sources = [
     'src/Point.cpp'
 
@@ -37,6 +54,11 @@ lib_sources = [
     ,'src/geometry/Line.cpp'
     ,'src/Rational.cpp'
     ,'src/Ray.cpp'
+    ,'src/Image.cpp'
+    ,'src/io/image_io.cpp'
+    ,'src/io/ppm.cpp'
+    ,'src/io/exr.cpp'
+    ,'src/io/png.cpp'
 ]
 
 include_dirs = [include_directories('include')]
@@ -50,7 +72,7 @@ art_headers_dep = declare_dependency(
 art_lib = library('art', lib_sources,
   include_directories: include_dirs,
   dependencies: internal_deps,
-  cpp_args: ['-DART_EXPORTS'],
+  cpp_args: ['-DART_EXPORTS'] + io_cpp_args,
   gnu_symbol_visibility: 'hidden')
 
 # Full dependency (headers + library linking)

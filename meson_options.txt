@@ -1,2 +1,4 @@
 option('testing', type : 'boolean', value : true, description : 'Enable tests')
 option('examples', type : 'boolean', value : true, description : 'Build examples')
+option('exr', type : 'boolean', value : false, description : 'EXR image I/O via tinyexr')
+option('png', type : 'boolean', value : false, description : 'PNG image I/O via stb_image')
