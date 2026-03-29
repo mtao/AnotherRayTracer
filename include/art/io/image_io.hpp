@@ -1,4 +1,5 @@
-#pragma once
+#if !defined(ART_IO_IMAGE_IO_HPP)
+#define ART_IO_IMAGE_IO_HPP
 
 #include <expected>
 #include <filesystem>
@@ -76,3 +77,5 @@ namespace ppm {
 } // namespace ppm
 
 } // namespace art::io
+
+#endif // ART_IO_IMAGE_IO_HPP

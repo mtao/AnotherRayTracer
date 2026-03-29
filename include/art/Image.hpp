@@ -1,4 +1,5 @@
-#pragma once
+#if !defined(ART_IMAGE_HPP)
+#define ART_IMAGE_HPP
 
 #include <array>
 #include <atomic>
@@ -35,9 +36,9 @@ class ART_API Image {
 
     // Move-only (std::atomic members prevent implicit copy/move).
     Image(const Image &) = delete;
-    Image &operator=(const Image &) = delete;
+    auto operator=(const Image &) -> Image & = delete;
     Image(Image &&other) noexcept;
-    Image &operator=(Image &&other) noexcept;
+    auto operator=(Image &&other) noexcept -> Image &;
 
     // ── Dimensions ──
 
@@ -125,32 +126,34 @@ class ART_API Image {
     void clear();
 
   private:
-    size_t _width = 0;
-    size_t _height = 0;
-    PixelFormat _format = PixelFormat::RGBAF32;
+    size_t m_width = 0;
+    size_t m_height = 0;
+    PixelFormat m_format = PixelFormat::RGBAF32;
 
     // Pixel storage: 4 floats per pixel (R, G, B, A), row-major.
-    std::vector<float> _pixels;
+    std::vector<float> m_pixels;
 
     // Per-pixel weight accumulator for add_sample mode.
     // Empty when using set_pixel mode only.
-    std::vector<float> _weights;
+    std::vector<float> m_weights;
 
-    // Resolved (normalized) cache — lazily computed from _pixels/_weights.
-    mutable std::vector<float> _resolved;
-    mutable uint64_t _resolved_version = 0;
+    // Resolved (normalized) cache — lazily computed from m_pixels/m_weights.
+    mutable std::vector<float> m_resolved;
+    mutable uint64_t m_resolved_version = 0;
 
     // Thread-safe progress and versioning.
-    std::atomic<size_t> _pixels_completed = 0;
-    std::atomic<uint64_t> _version = 0;
+    std::atomic<size_t> m_pixels_completed = 0;
+    std::atomic<uint64_t> m_version = 0;
 
-    UpdateCallback _on_update;
+    UpdateCallback m_on_update;
 
     // ── Internal helpers ──
 
-    auto _pixel_index(size_t x, size_t y) const -> size_t;
-    void _notify(size_t x, size_t y, size_t w, size_t h);
-    void _ensure_resolved() const;
+    auto pixel_index(size_t x, size_t y) const -> size_t;
+    void notify(size_t x, size_t y, size_t w, size_t h);
+    void ensure_resolved() const;
 };
 
 } // namespace art
+
+#endif // ART_IMAGE_HPP

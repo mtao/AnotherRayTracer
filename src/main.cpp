@@ -11,7 +11,7 @@
 
 void sphere() {
     using namespace art;
-    Camera cam(Camera::lookAt(/*position=*/Point(0, 0, 5),
+    Camera cam(Camera::look_at(/*position=*/Point(0, 0, 5),
                               /*looking_at=*/Point(0, 0, 0),
                               /*up=*/Point(0, 1, 0)));
 
@@ -23,7 +23,7 @@ void sphere() {
 
 void cube() {
     using namespace art;
-    Camera cam(Camera::lookAt(/*position=*/Point(0, 0, 5),
+    Camera cam(Camera::look_at(/*position=*/Point(0, 0, 5),
                               /*looking_at=*/Point(0, 0, 0),
                               /*up=*/Point(0, 1, 0)));
 
@@ -39,7 +39,7 @@ void cube() {
 
 void both() {
     using namespace art;
-    Camera cam(Camera::lookAt(/*position=*/Point(0, 0, 5),
+    Camera cam(Camera::look_at(/*position=*/Point(0, 0, 5),
                               /*looking_at=*/Point(0, 0, 0),
                               /*up=*/Point(0, 1, 0)));
 
