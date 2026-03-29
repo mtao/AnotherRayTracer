@@ -3,6 +3,7 @@
 #include <zipper/transform/transform.hpp>
 
 #include "art/Camera.hpp"
+#include "art/accel/LinearAccelerator.hpp"
 #include "art/geometry/Box.hpp"
 #include "art/geometry/Sphere.hpp"
 #include "art/io/image_io.hpp"
@@ -15,10 +16,13 @@ void sphere() {
                               /*looking_at=*/Point(0, 0, 0),
                               /*up=*/Point(0, 1, 0)));
 
-    objects::Object sphere(*std::make_shared<geometry::Sphere>());
-    sphere.update_bounding_box();
+    auto obj = std::make_shared<objects::Object>(
+        *std::make_shared<geometry::Sphere>());
 
-    Image img = cam.render(20, 20, sphere);
+    accel::LinearAccelerator accel;
+    accel.build(*obj);
+
+    Image img = cam.render(20, 20, accel);
 }
 
 void cube() {
@@ -27,14 +31,17 @@ void cube() {
                               /*looking_at=*/Point(0, 0, 0),
                               /*up=*/Point(0, 1, 0)));
 
-    objects::Object cube(*std::make_shared<geometry::Box>());
+    auto obj =
+        std::make_shared<objects::Object>(*std::make_shared<geometry::Box>());
 
-    cube.transform() =
+    obj->transform() =
         zipper::transform::AxisAngleRotation<double>(1.8, {0., 0., 1.})
             .to_transform();
-    cube.update_bounding_box();
 
-    Image img = cam.render(20, 20, cube);
+    accel::LinearAccelerator accel;
+    accel.build(*obj);
+
+    Image img = cam.render(20, 20, accel);
 }
 
 void both() {
@@ -56,18 +63,19 @@ void both() {
             .to_transform();
 
     auto scene = std::make_shared<objects::InternalSceneNode>();
-
     scene->add_node(cube);
     scene->add_node(sphere);
 
-    scene->update_bounding_box();
+    accel::LinearAccelerator accel;
+    accel.build(*scene);
 
-    Image img = cam.render(100, 100, *scene);
+    Image img = cam.render(100, 100, accel);
     auto result = art::io::save("both.ppm", img);
     if (!result) {
         std::cerr << "Failed to save: " << result.error() << std::endl;
     }
 }
+
 int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
     sphere();
     cube();

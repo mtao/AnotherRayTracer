@@ -5,6 +5,7 @@
 
 #include <art/Point.hpp>
 #include <art/Ray.hpp>
+#include <art/accel/LinearAccelerator.hpp>
 #include <art/geometry/Box.hpp>
 #include <art/geometry/Sphere.hpp>
 #include <art/objects/InternalSceneNode.hpp>
@@ -213,11 +214,12 @@ TEST_CASE("tmax_closest_hit_with_direct_geometry", "[tmax][intersection]") {
 }
 
 // ============================================================
-// SceneNode normal/tangent transforms
+// Accelerator-based normal/tangent transforms (replaces old
+// SceneNode::intersect() tests)
 // ============================================================
 
-TEST_CASE("scene_node_transforms_normals_and_tangents",
-          "[scenenode][intersection]") {
+TEST_CASE("accelerator_transforms_normals_and_tangents",
+          "[accelerator][intersection]") {
     auto sphere = std::make_shared<geometry::Sphere>();
     auto obj = std::make_shared<objects::Object>(*sphere);
 
@@ -225,14 +227,16 @@ TEST_CASE("scene_node_transforms_normals_and_tangents",
     obj->transform() =
         zipper::transform::Translation<double>(Vector3d{3.0, 0.0, 0.0})
             .to_transform();
-    obj->update_bounding_box();
+
+    accel::LinearAccelerator accel;
+    accel.build(*obj);
 
     Ray ray;
     ray.origin = Point(10, 0, 0);
     ray.direction = Vector3d{-1.0, 0.0, 0.0};
 
     std::optional<Intersection> isect;
-    REQUIRE(obj->intersect(ray, isect));
+    REQUIRE(accel.intersect(ray, isect));
     REQUIRE(isect.has_value());
 
     // Hit point should be near (4, 0, 0) — surface of unit sphere at origin
@@ -250,14 +254,16 @@ TEST_CASE("scene_node_transforms_normals_and_tangents",
     CHECK(std::abs(n(2)) < 1e-4);
 }
 
-TEST_CASE("scene_node_scaled_normals", "[scenenode][intersection]") {
+TEST_CASE("accelerator_scaled_normals", "[accelerator][intersection]") {
     auto sphere = std::make_shared<geometry::Sphere>();
     auto obj = std::make_shared<objects::Object>(*sphere);
 
     // Non-uniform scale: stretch x by 2
     auto S = zipper::transform::Scaling<double>(Vector3d{2.0, 1.0, 1.0});
     obj->transform() = S.to_transform();
-    obj->update_bounding_box();
+
+    accel::LinearAccelerator accel;
+    accel.build(*obj);
 
     // Ray along x axis at the equator
     Ray ray;
@@ -265,7 +271,7 @@ TEST_CASE("scene_node_scaled_normals", "[scenenode][intersection]") {
     ray.direction = Vector3d{-1.0, 0.0, 0.0};
 
     std::optional<Intersection> isect;
-    REQUIRE(obj->intersect(ray, isect));
+    REQUIRE(accel.intersect(ray, isect));
     REQUIRE(isect.has_value());
 
     // Hit point should be near (2, 0, 0) — scaled sphere surface

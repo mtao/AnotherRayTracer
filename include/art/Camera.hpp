@@ -3,8 +3,11 @@
 #include "art/Image.hpp"
 #include "art/Point.hpp"
 #include "art/export.hpp"
-#include "art/objects/SceneNode.hpp"
 #include "art/utils/AffineTransform.hpp"
+
+namespace art::accel {
+class SceneAccelerator;
+}
 
 namespace art {
 
@@ -16,7 +19,9 @@ class ART_API Camera {
 
     Camera(const utils::Isometry &ct) : _camera_transform(ct) {}
 
-    auto render(size_t nx, size_t ny, objects::SceneNode &node) const -> Image;
+    auto render(size_t nx,
+                size_t ny,
+                const accel::SceneAccelerator &accelerator) const -> Image;
 
     auto transform() const -> const utils::Isometry & {
         return _camera_transform;

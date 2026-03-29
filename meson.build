@@ -56,6 +56,11 @@ lib_sources = [
     ,'src/objects/InternalSceneNode.cpp'
     ,'src/objects/Object.cpp'
 
+    ,'src/accel/SceneAccelerator.cpp'
+    ,'src/accel/intersect_primitive.cpp'
+    ,'src/accel/LinearAccelerator.cpp'
+    ,'src/accel/BVHAccelerator.cpp'
+
     ,'src/Camera.cpp'
     ,'src/geometry/Line.cpp'
     ,'src/Rational.cpp'

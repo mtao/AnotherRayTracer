@@ -3,7 +3,9 @@
 #include <zipper/transform/transform.hpp>
 
 #include "art/Ray.hpp"
+#include "art/accel/SceneAccelerator.hpp"
 #include "art/utils/AffineTransform.hpp"
+
 namespace art {
 
 auto Camera::lookAt(const Point &position, const Point &target, const Point &up)
@@ -14,8 +16,9 @@ auto Camera::lookAt(const Point &position, const Point &target, const Point &up)
     return zipper::transform::look_at(eye, center, up_vec);
 }
 
-auto Camera::render(size_t nx, size_t ny, objects::SceneNode &node) const
-    -> Image {
+auto Camera::render(size_t nx,
+                    size_t ny,
+                    const accel::SceneAccelerator &accelerator) const -> Image {
     Image image(nx, ny);
 
     Ray ray;
@@ -40,7 +43,7 @@ auto Camera::render(size_t nx, size_t ny, objects::SceneNode &node) const
             ray.tMax = Rational(std::numeric_limits<double>::infinity());
 
             std::optional<Intersection> isect;
-            if (node.intersect(ray, isect)) {
+            if (accelerator.intersect(ray, isect)) {
                 // Normal-based coloring: map normal components to [0,1]
                 auto n = isect->geometric_normal.normalized();
                 float r = static_cast<float>(n(0) * 0.5 + 0.5);
