@@ -1,4 +1,5 @@
-#pragma once
+#if !defined(ART_INTERSECTION_HPP)
+#define ART_INTERSECTION_HPP
 #include "art/types.hpp"
 
 namespace art {
@@ -10,3 +11,4 @@ struct Intersection {
     // std::shared_ptr<Material> material = nullptr;
 };
 }  // namespace art
+#endif

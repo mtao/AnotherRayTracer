@@ -1,4 +1,5 @@
-#pragma once
+#if !defined(ART_OBJECTS_SCENENODE_HPP)
+#define ART_OBJECTS_SCENENODE_HPP
 #include <memory>
 #include <optional>
 
@@ -39,3 +40,4 @@ class ART_API SceneNode {
     utils::AffineTransform _transform;
 };
 }  // namespace art::objects
+#endif

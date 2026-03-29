@@ -1,4 +1,5 @@
-#pragma once
+#if !defined(ART_POINT_HXX)
+#define ART_POINT_HXX
 #include "art/Point.hpp"
 
 #include <limits>
@@ -160,3 +161,4 @@ ART_INLINE bool operator==(const Point& a, const Point& b) {
 }
 
 }  // namespace art
+#endif

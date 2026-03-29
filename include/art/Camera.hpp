@@ -1,4 +1,5 @@
-#pragma once
+#if !defined(ART_CAMERA_HPP)
+#define ART_CAMERA_HPP
 
 #include "art/Image.hpp"
 #include "art/Point.hpp"
@@ -23,3 +24,4 @@ class ART_API Camera {
     utils::Isometry _camera_transform;
 };
 }  // namespace art
+#endif

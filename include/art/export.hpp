@@ -1,4 +1,5 @@
-#pragma once
+#if !defined(ART_EXPORT_HPP)
+#define ART_EXPORT_HPP
 
 #ifdef _WIN32
 #ifdef ART_EXPORTS
@@ -8,4 +9,5 @@
 #endif
 #else
 #define ART_API __attribute__((visibility("default")))
+#endif
 #endif
