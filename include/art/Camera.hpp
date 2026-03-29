@@ -9,17 +9,20 @@
 namespace art {
 
 class ART_API Camera {
-   public:
-    static utils::Isometry lookAt(const Point& position, const Point& target,
-                                  const Point& up);
+  public:
+    static auto lookAt(const Point &position,
+                       const Point &target,
+                       const Point &up) -> utils::Isometry;
 
-    Camera(const utils::Isometry& ct) : _camera_transform(ct) {}
+    Camera(const utils::Isometry &ct) : _camera_transform(ct) {}
 
-    Image render(size_t nx, size_t ny, objects::SceneNode& node) const;
+    auto render(size_t nx, size_t ny, objects::SceneNode &node) const -> Image;
 
-    const utils::Isometry& transform() const { return _camera_transform; }
+    auto transform() const -> const utils::Isometry & {
+        return _camera_transform;
+    }
 
-   private:
+  private:
     utils::Isometry _camera_transform;
 };
-}  // namespace art
+} // namespace art

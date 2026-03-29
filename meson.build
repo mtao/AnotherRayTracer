@@ -9,18 +9,18 @@ spdlog_version = '>=1.9.2'
 
 
 
-cc = meson.get_compiler('cpp')
-dl_lib = cc.find_library('dl')
-
-
 spdlog_dep = dependency('spdlog', version: spdlog_version, default_options: ['tests=disabled'])
 
-zipper_proj = subproject('zipper', default_options: {'testing': false, 'examples': false})
-zipper_dep = zipper_proj.get_variable('zipper_dep')
+zipper_dep = dependency('zipper', default_options: ['testing=false', 'examples=false'])
 
-TBB_dep = dependency('tbb')
+quiver_dep = dependency('quiver', default_options: [
+    'testing=false',
+    'examples=false',
+    'tools=false',
+    'lua=false',
+])
 
-required_deps = [zipper_dep]
+required_deps = [zipper_dep, quiver_dep]
 internal_deps = [spdlog_dep] + required_deps
 
 # Optional image I/O dependencies
@@ -45,6 +45,12 @@ lib_sources = [
 
     ,'src/geometry/Box.cpp'
     ,'src/geometry/Sphere.cpp'
+    ,'src/geometry/Plane.cpp'
+    ,'src/geometry/Disk.cpp'
+    ,'src/geometry/Cylinder.cpp'
+    ,'src/geometry/Triangle.cpp'
+    ,'src/geometry/MeshGeometry.cpp'
+    ,'src/geometry/mesh_utils.cpp'
 
     ,'src/objects/SceneNode.cpp'
     ,'src/objects/InternalSceneNode.cpp'
@@ -80,6 +86,8 @@ art_dep = declare_dependency(
   link_with: art_lib,
   dependencies: required_deps,
   include_directories: include_dirs)
+meson.override_dependency('art', art_dep)
+meson.override_dependency('art-headers', art_headers_dep)
 
 
 art_exec = executable('art', 'src/main.cpp', dependencies: [art_dep] + internal_deps)
