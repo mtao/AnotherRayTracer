@@ -13,7 +13,14 @@ spdlog_dep = dependency('spdlog', version: spdlog_version, default_options: ['te
 
 zipper_dep = dependency('zipper', default_options: ['testing=false', 'examples=false'])
 
-required_deps = [zipper_dep]
+quiver_dep = dependency('quiver', default_options: [
+    'testing=false',
+    'examples=false',
+    'tools=false',
+    'lua=false',
+])
+
+required_deps = [zipper_dep, quiver_dep]
 internal_deps = [spdlog_dep] + required_deps
 
 # Optional image I/O dependencies
@@ -42,6 +49,8 @@ lib_sources = [
     ,'src/geometry/Disk.cpp'
     ,'src/geometry/Cylinder.cpp'
     ,'src/geometry/Triangle.cpp'
+    ,'src/geometry/MeshGeometry.cpp'
+    ,'src/geometry/mesh_utils.cpp'
 
     ,'src/objects/SceneNode.cpp'
     ,'src/objects/InternalSceneNode.cpp'
