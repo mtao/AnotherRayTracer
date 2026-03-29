@@ -1,4 +1,5 @@
-#pragma once
+#if !defined(ART_OBJECTS_INTERNALSCENENODE_HPP)
+#define ART_OBJECTS_INTERNALSCENENODE_HPP
 #include "art/export.hpp"
 #include "art/objects/SceneNode.hpp"
 
@@ -18,3 +19,4 @@ class ART_API InternalSceneNode : public SceneNode {
     std::vector<SceneNode::Ptr> _children;
 };
 }  // namespace art::objects
+#endif

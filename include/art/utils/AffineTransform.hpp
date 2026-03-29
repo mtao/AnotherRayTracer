@@ -1,4 +1,5 @@
-#pragma once
+#if !defined(ART_UTILS_AFFINETRANSFORM_HPP)
+#define ART_UTILS_AFFINETRANSFORM_HPP
 
 #include <zipper/transform/transform.hpp>
 
@@ -12,3 +13,4 @@ using Isometry = zipper::transform::Isometry<double, 3>;
 using ProjectiveTransform = zipper::transform::ProjectiveTransform<double, 3>;
 
 }  // namespace art::utils
+#endif

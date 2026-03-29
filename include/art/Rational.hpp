@@ -1,4 +1,5 @@
-#pragma once
+#if !defined(ART_RATIONAL_HPP)
+#define ART_RATIONAL_HPP
 
 #include <format>
 #include <string>
@@ -80,4 +81,5 @@ ART_API Rational sqrt(const Rational& r);
 
 #if !defined(ART_REDUCE_INLINING)
 #include "Rational.hxx"
+#endif
 #endif

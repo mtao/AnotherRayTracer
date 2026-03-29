@@ -1,4 +1,5 @@
-#pragma once
+#if !defined(ART_GEOMETRY_LINE_HPP)
+#define ART_GEOMETRY_LINE_HPP
 #include "art/zipper_types.hpp"
 #include "art/export.hpp"
 #include "art/Point.hpp"
@@ -71,3 +72,4 @@ struct ART_API Line : public Vector6d {
     operator std::string() const;
 };
 }  // namespace art
+#endif

@@ -1,6 +1,5 @@
 #if !defined(ART_GEOMETRY_GEOMETRY_HPP)
 #define ART_GEOMETRY_GEOMETRY_HPP
-#pragma once
 #include <memory>
 #include <optional>
 
