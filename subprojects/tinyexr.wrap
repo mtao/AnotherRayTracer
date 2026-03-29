@@ -1,0 +1,9 @@
+[wrap-file]
+directory = tinyexr-1.0.9
+source_url = https://github.com/syoyo/tinyexr/archive/refs/tags/v1.0.9.tar.gz
+source_filename = tinyexr-1.0.9.tar.gz
+source_hash = f9e05127c3db23f9c4269c9a922ed0d3d911486efd884883e1f01b0ee19de91e
+patch_directory = tinyexr
+
+[provide]
+tinyexr = tinyexr_dep

@@ -5,12 +5,13 @@
 #include "art/Camera.hpp"
 #include "art/geometry/Box.hpp"
 #include "art/geometry/Sphere.hpp"
+#include "art/io/image_io.hpp"
 #include "art/objects/InternalSceneNode.hpp"
 #include "art/objects/Object.hpp"
 
 void sphere() {
     using namespace art;
-    Camera cam(Camera::lookAt(/*position=*/Point(0, 0, 5),
+    Camera cam(Camera::look_at(/*position=*/Point(0, 0, 5),
                               /*looking_at=*/Point(0, 0, 0),
                               /*up=*/Point(0, 1, 0)));
 
@@ -22,7 +23,7 @@ void sphere() {
 
 void cube() {
     using namespace art;
-    Camera cam(Camera::lookAt(/*position=*/Point(0, 0, 5),
+    Camera cam(Camera::look_at(/*position=*/Point(0, 0, 5),
                               /*looking_at=*/Point(0, 0, 0),
                               /*up=*/Point(0, 1, 0)));
 
@@ -38,7 +39,7 @@ void cube() {
 
 void both() {
     using namespace art;
-    Camera cam(Camera::lookAt(/*position=*/Point(0, 0, 5),
+    Camera cam(Camera::look_at(/*position=*/Point(0, 0, 5),
                               /*looking_at=*/Point(0, 0, 0),
                               /*up=*/Point(0, 1, 0)));
 
@@ -62,8 +63,12 @@ void both() {
     scene->update_bounding_box();
 
     Image img = cam.render(100, 100, *scene);
+    auto result = art::io::save("both.ppm", img);
+    if (!result) {
+        std::cerr << "Failed to save: " << result.error() << std::endl;
+    }
 }
-int main(int argc, char* argv[]) {
+int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
     sphere();
     cube();
     both();
