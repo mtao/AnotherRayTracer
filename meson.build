@@ -13,12 +13,21 @@ spdlog_dep = dependency('spdlog', version: spdlog_version, default_options: ['te
 
 zipper_dep = dependency('zipper', default_options: ['testing=false', 'examples=false'])
 
-quiver_dep = dependency('quiver', default_options: [
+# Determine lua option early so quiver can be built with lua support if needed.
+lua_enabled = get_option('lua')
+
+quiver_opts = [
     'testing=false',
     'examples=false',
     'tools=false',
-    'lua=false',
-])
+]
+if lua_enabled
+  quiver_opts += 'lua=true'
+else
+  quiver_opts += 'lua=false'
+endif
+
+quiver_dep = dependency('quiver', default_options: quiver_opts)
 
 required_deps = [zipper_dep, quiver_dep]
 internal_deps = [spdlog_dep] + required_deps
@@ -38,6 +47,28 @@ if get_option('png')
   stb_dep = stb_proj.get_variable('stb_dep')
   internal_deps += stb_dep
   io_cpp_args += '-DART_HAS_PNG=1'
+endif
+
+# Optional: sol2 Lua bindings for scene description.
+# sol2's meson.build pulls lua as a dependency internally.
+# lua_enabled was determined above (before quiver dep).
+lua_sources = []
+lua_deps = []
+lua_cpp_args = []
+if lua_enabled
+  sol2_proj = subproject('sol2')
+  sol2_dep = sol2_proj.get_variable('sol2_dep')
+  lua_deps += [sol2_dep]
+  lua_cpp_args += '-DART_HAS_LUA=1'
+  lua_sources += [
+      'src/lua/bindings.cpp',
+      'src/lua/bind_geometry.cpp',
+      'src/lua/bind_scene.cpp',
+      'src/lua/bind_camera.cpp',
+      'src/lua/bind_image.cpp',
+      'src/lua/bind_transform.cpp',
+      'src/lua/scene_loader.cpp',
+  ]
 endif
 
 lib_sources = [
@@ -80,10 +111,10 @@ art_headers_dep = declare_dependency(
   include_directories: include_dirs)
 
 # Compiled library
-art_lib = library('art', lib_sources,
+art_lib = library('art', lib_sources + lua_sources,
   include_directories: include_dirs,
-  dependencies: internal_deps,
-  cpp_args: ['-DART_EXPORTS'] + io_cpp_args,
+  dependencies: internal_deps + lua_deps,
+  cpp_args: ['-DART_EXPORTS'] + io_cpp_args + lua_cpp_args,
   gnu_symbol_visibility: 'hidden')
 
 # Full dependency (headers + library linking)
@@ -96,6 +127,12 @@ meson.override_dependency('art-headers', art_headers_dep)
 
 
 art_exec = executable('art', 'src/main.cpp', dependencies: [art_dep] + internal_deps)
+
+if lua_enabled
+  art_lua_exec = executable('art-lua', 'src/art_lua.cpp',
+    dependencies: [art_dep] + internal_deps + lua_deps,
+    cpp_args: lua_cpp_args)
+endif
 
 
 if get_option('testing')
