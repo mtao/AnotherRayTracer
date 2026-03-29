@@ -3,14 +3,12 @@
 #include "art/geometry/Geometry.hpp"
 
 namespace art::geometry {
-// A unit sphere stored at the origin
-class ART_API Sphere : public Geometry {
+// Infinite plane at z=0 in local space.
+// Transform via SceneNode to position/orient in the scene.
+class ART_API Plane : public Geometry {
   public:
     auto bounding_box() const -> Box override;
     auto intersect(const Ray &ray, std::optional<Intersection> &isect) const
         -> bool override;
-
-  private:
-    Rational radius = 1.;
 };
 } // namespace art::geometry

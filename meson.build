@@ -38,6 +38,10 @@ lib_sources = [
 
     ,'src/geometry/Box.cpp'
     ,'src/geometry/Sphere.cpp'
+    ,'src/geometry/Plane.cpp'
+    ,'src/geometry/Disk.cpp'
+    ,'src/geometry/Cylinder.cpp'
+    ,'src/geometry/Triangle.cpp'
 
     ,'src/objects/SceneNode.cpp'
     ,'src/objects/InternalSceneNode.cpp'

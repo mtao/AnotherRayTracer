@@ -16,6 +16,7 @@ using Vector = zipper::Vector<T, R>;
 template <typename T, int R>
 using RowVector = zipper::Form<T, R>;
 
+using Vector2d = Vector<double, 2>;
 using Vector3d = Vector<double, 3>;
 using Vector4d = Vector<double, 4>;
 using Vector6d = Vector<double, 6>;
@@ -23,11 +24,11 @@ using Matrix3d = Matrix<double, 3, 3>;
 using Matrix4d = Matrix<double, 4, 4>;
 
 template <typename T>
-concept Matrix3x3Like = zipper::concepts::Matrix<T> &&
-                        zipper::concepts::ValidExtents<T, 3, 3>;
+concept Matrix3x3Like =
+    zipper::concepts::Matrix<T> && zipper::concepts::ValidExtents<T, 3, 3>;
 
 template <typename T>
-concept Vector3Like = zipper::concepts::Vector<T> &&
-                      zipper::concepts::ValidExtents<T, 3>;
+concept Vector3Like =
+    zipper::concepts::Vector<T> && zipper::concepts::ValidExtents<T, 3>;
 
-}  // namespace art
+} // namespace art

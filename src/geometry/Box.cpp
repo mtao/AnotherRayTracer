@@ -7,84 +7,101 @@
 #include "art/Ray.hpp"
 namespace art::geometry {
 
-std::string format_as(const Box& r) {
-    return std::format("Box[{}:{}]", std::string(r.min()), std::string(r.max()));
+auto format_as(const Box &r) -> std::string {
+    return std::format(
+        "Box[{}:{}]", std::string(r.min()), std::string(r.max()));
 }
 
-Box Box::bounding_box() const { return *this; }
-bool Box::intersect(const Ray& ray, std::optional<Intersection>& isect) const {
-    Rational max_t = isect.has_value()
-                         ? isect->t
-                         : Rational(std::numeric_limits<double>::max());
+auto Box::bounding_box() const -> Box { return *this; }
+auto Box::intersect(const Ray &ray, std::optional<Intersection> &isect) const
+    -> bool {
     const Point p = ray.origin;
     if (contains(p)) {
         return true;
     } else {
-        auto check = [&](zipper::rank_type a, zipper::rank_type b,
+        auto check = [&](zipper::rank_type a,
+                         zipper::rank_type b,
                          zipper::rank_type c) -> bool {
             const auto o = p(a);
             Rational target;
             bool from_above = ray.direction(a) < 0;
             if (from_above) {
                 target = max()(a);
-                // if the target plane  requires going forward (direction is
-                // negative)
-                if (target > o) {
-                    return false;
-                }
+                if (target > o) { return false; }
             } else {
                 target = min()(a);
-                // if the target plane requires going back (direction is
-                // positive)
-                if (target < o) {
-                    return false;
-                }
+                if (target < o) { return false; }
             }
             Rational t = (target - ray.origin(a)) / ray.direction(a);
 
-            if (t > max_t) {
-                return false;
-            } else {
-                Rational bp = ray.direction(b) * t + ray.origin(b);
-                Rational cp = ray.direction(c) * t + ray.origin(c);
+            if (t > ray.tMax) { return false; }
+            // Check against existing intersection
+            if (isect && isect->t < t) { return false; }
 
-                if (min()(b) >= bp || max()(b) <= bp) {
-                    return false;
-                }
-                if (min()(c) >= cp || max()(c) <= cp) {
-                    return false;
-                }
+            Rational bp = ray.direction(b) * t + ray.origin(b);
+            Rational cp = ray.direction(c) * t + ray.origin(c);
 
-                isect = Intersection();
-                isect->t = t;
-                switch (a) {
-                    case 0: {
-                        assert(b == 1);
-                        assert(c == 2);
-                        isect->position = Point(target, bp, cp);
-                    } break;
-                    case 1: {
-                        assert(b == 0);
-                        assert(c == 2);
-                        isect->position = Point(bp, target, cp);
-                    } break;
-                    case 2: {
-                        assert(b == 1);
-                        assert(c == 0);
-                        isect->position = Point(cp, bp, target);
-                    } break;
-                    default:
-                        assert(false);
-                }
-                if (from_above) {
-                    isect->normal =
-                        zipper::expression::nullary::unit_vector<double, 3>(a);
-                } else {
-                    isect->normal = -Vector3d(
-                        zipper::expression::nullary::unit_vector<double, 3>(a));
-                }
-                return true;
+            if (min()(b) >= bp || max()(b) <= bp) { return false; }
+            if (min()(c) >= cp || max()(c) <= cp) { return false; }
+
+            ray.tMax = t;
+
+            isect = Intersection();
+            isect->t = t;
+            switch (a) {
+            case 0: {
+                assert(b == 1);
+                assert(c == 2);
+                isect->position = Point(target, bp, cp);
+            } break;
+            case 1: {
+                assert(b == 0);
+                assert(c == 2);
+                isect->position = Point(bp, target, cp);
+            } break;
+            case 2: {
+                assert(b == 1);
+                assert(c == 0);
+                isect->position = Point(cp, bp, target);
+            } break;
+            default:
+                assert(false);
             }
+            if (from_above) {
+                isect->geometric_normal =
+                    zipper::expression::nullary::unit_vector<double, 3>(a);
+            } else {
+                isect->geometric_normal = -Vector3d(
+                    zipper::expression::nullary::unit_vector<double, 3>(a));
+            }
+
+            // Face-local UV: the two non-hit axes mapped to [0,1]
+            // relative to the box extents
+            Vector3d hit_pos = Vector3d(isect->position);
+            Vector3d box_min = Vector3d(min());
+            Vector3d box_max = Vector3d(max());
+            double extent_b = double(box_max(b)) - double(box_min(b));
+            double extent_c = double(box_max(c)) - double(box_min(c));
+            double u_val = extent_b > 0
+                               ? (hit_pos(b) - double(box_min(b))) / extent_b
+                               : 0.0;
+            double v_val = extent_c > 0
+                               ? (hit_pos(c) - double(box_min(c))) / extent_c
+                               : 0.0;
+            isect->uv = Vector2d{u_val, v_val};
+
+            // dpdu/dpdv: unit vectors along the face plane
+            isect->dpdu = Vector3d(
+                zipper::expression::nullary::unit_vector<double, 3>(b));
+            isect->dpdv = Vector3d(
+                zipper::expression::nullary::unit_vector<double, 3>(c));
+
+            isect->geometry = this;
+            // Face index: 0-2 positive faces, 3-5 negative faces
+            isect->primitive_index = from_above ? static_cast<uint32_t>(a)
+                                                : static_cast<uint32_t>(a + 3);
+
+            return true;
         };
 
         const bool c0 = check(0, 1, 2);
@@ -95,17 +112,17 @@ bool Box::intersect(const Ray& ray, std::optional<Intersection>& isect) const {
     return true;
 }
 
-bool Box::intersect(const Ray& ray) const {
+auto Box::intersect(const Ray &ray) const -> bool {
     std::optional<Intersection> isec;
     return intersect(ray, isec);
 }
 
-Box& Box::expand(const Box& bb) {
+auto Box::expand(const Box &bb) -> Box & {
     expand(bb._min);
     expand(bb._max);
     return *this;
 }
-Box& Box::expand(const Point& p) {
+auto Box::expand(const Point &p) -> Box & {
     std::array<Rational, 3> nmin;
     std::array<Rational, 3> nmax;
     for (size_t i = 0; i < 3; ++i) {
@@ -117,16 +134,16 @@ Box& Box::expand(const Point& p) {
     return *this;
 }
 
-bool Box::contains(const Point& p) const {
-    bool above_min = (p.denominator() * _min.numerator().as_array() <
-                      _min.denominator() * p.numerator().as_array())
+auto Box::contains(const Point &p) const -> bool {
+    bool above_min = (p.denominator() * _min.numerator().as_array()
+                      < _min.denominator() * p.numerator().as_array())
                          .all();
-    bool below_max = (p.denominator() * _max.numerator().as_array() >
-                      _max.denominator() * p.numerator().as_array())
+    bool below_max = (p.denominator() * _max.numerator().as_array()
+                      > _max.denominator() * p.numerator().as_array())
                          .all();
     return above_min && below_max;
 }
-bool Box::contains(const Box& bb) const {
+auto Box::contains(const Box &bb) const -> bool {
     return contains(bb.min()) && contains(bb.max());
 }
-}  // namespace art::geometry
+} // namespace art::geometry
