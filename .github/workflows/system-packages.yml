@@ -98,6 +98,7 @@ jobs:
         run: >
           meson setup build/
           --buildtype=${{ matrix.build_type }}
+          --wrap-mode=forcefallback
           -Dtesting=true
 
       - name: Build

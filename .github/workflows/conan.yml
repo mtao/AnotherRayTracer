@@ -126,7 +126,7 @@ jobs:
         env:
           CC: ${{ runner.os != 'Windows' && format('ccache {0}', matrix.platform.cc) || matrix.platform.cc }}
           CXX: ${{ runner.os != 'Windows' && format('ccache {0}', matrix.platform.cxx) || matrix.platform.cxx }}
-        run: meson setup builddir/ --native-file builddir/conan/conan_meson_native.ini
+        run: meson setup builddir/ --wrap-mode=forcefallback --native-file builddir/conan/conan_meson_native.ini
 
       - name: Build
         run: meson compile -C builddir/
