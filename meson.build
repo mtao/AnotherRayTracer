@@ -56,7 +56,7 @@ art_dep = declare_dependency(
   include_directories: include_dirs)
 
 
-art_exec = executable('art', 'src/main.cpp', dependencies: [art_dep] + internal_deps)
+art_exec = executable('art-cli', 'src/main.cpp', dependencies: [art_dep] + internal_deps)
 
 
 if get_option('testing')
