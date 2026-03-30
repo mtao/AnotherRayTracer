@@ -1,7 +1,7 @@
 #include "art/Camera.hpp"
 
 #include <iostream>
-#include <zipper/transform/transform.hpp>
+#include <zipper/transform/all.hpp>
 
 #include "art/Ray.hpp"
 #include "art/utils/AffineTransform.hpp"
