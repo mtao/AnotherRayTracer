@@ -1,9 +1,10 @@
 /// @file tests/test_scene_loader.cpp
-/// Tests for the Lua table DSL scene loader.
+/// Tests for the Lua table DSL scene loader and serializer.
 
 #include <catch2/catch_all.hpp>
 
 #include "art/lua/scene_loader.hpp"
+#include "art/lua/scene_serializer.hpp"
 #include "art/objects/InternalSceneNode.hpp"
 #include "art/objects/Object.hpp"
 
@@ -295,4 +296,330 @@ TEST_CASE("load_scene_from_string: transform with scale + rotate + translate",
 
     REQUIRE(result.has_value());
     REQUIRE(result->root != nullptr);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Serializer tests
+// ═══════════════════════════════════════════════════════════════════════
+
+TEST_CASE("serialize_scene: single sphere round-trip", "[lua][serializer]") {
+    auto original = lua::load_scene_from_string(R"lua(
+        return {
+            render = { width = 320, height = 240, output = "out.ppm" },
+            camera = {
+                position = {0, 0, 5},
+                target = {0, 0, 0},
+                up = {0, 1, 0},
+            },
+            scene = {
+                { type = "sphere" },
+            },
+        }
+    )lua");
+    REQUIRE(original.has_value());
+
+    auto lua_str = lua::serialize_scene(*original);
+    REQUIRE(!lua_str.empty());
+
+    // Re-load from serialized output
+    auto reloaded = lua::load_scene_from_string(lua_str);
+    REQUIRE(reloaded.has_value());
+
+    CHECK(reloaded->width == 320);
+    CHECK(reloaded->height == 240);
+    CHECK(reloaded->output_path == "out.ppm");
+    REQUIRE(reloaded->root != nullptr);
+}
+
+TEST_CASE("serialize_scene: multiple geometry types round-trip",
+          "[lua][serializer]") {
+    auto original = lua::load_scene_from_string(R"lua(
+        return {
+            camera = {
+                position = {0, 0, 5},
+                target = {0, 0, 0},
+                up = {0, 1, 0},
+            },
+            scene = {
+                { type = "sphere" },
+                { type = "box" },
+                { type = "plane" },
+                { type = "disk" },
+                { type = "cylinder" },
+            },
+        }
+    )lua");
+    REQUIRE(original.has_value());
+
+    auto lua_str = lua::serialize_scene(*original);
+    auto reloaded = lua::load_scene_from_string(lua_str);
+    REQUIRE(reloaded.has_value());
+
+    auto group =
+        std::dynamic_pointer_cast<objects::InternalSceneNode>(reloaded->root);
+    REQUIRE(group != nullptr);
+    CHECK(group->children().size() == 5);
+}
+
+TEST_CASE("serialize_scene: box with custom bounds round-trip",
+          "[lua][serializer]") {
+    auto original = lua::load_scene_from_string(R"lua(
+        return {
+            camera = {
+                position = {0, 0, 5},
+                target = {0, 0, 0},
+                up = {0, 1, 0},
+            },
+            scene = {
+                { type = "box", min = {-2, -3, -4}, max = {2, 3, 4} },
+            },
+        }
+    )lua");
+    REQUIRE(original.has_value());
+
+    auto lua_str = lua::serialize_scene(*original);
+
+    // The serialized string should contain the custom bounds
+    CHECK(lua_str.find("min") != std::string::npos);
+    CHECK(lua_str.find("max") != std::string::npos);
+
+    auto reloaded = lua::load_scene_from_string(lua_str);
+    REQUIRE(reloaded.has_value());
+    REQUIRE(reloaded->root != nullptr);
+}
+
+TEST_CASE("serialize_scene: triangle round-trip", "[lua][serializer]") {
+    auto original = lua::load_scene_from_string(R"lua(
+        return {
+            camera = {
+                position = {0, 0, 5},
+                target = {0, 0, 0},
+                up = {0, 1, 0},
+            },
+            scene = {
+                { type = "triangle", vertices = {{0,0,0}, {1,0,0}, {0,1,0}} },
+            },
+        }
+    )lua");
+    REQUIRE(original.has_value());
+
+    auto lua_str = lua::serialize_scene(*original);
+
+    CHECK(lua_str.find("triangle") != std::string::npos);
+    CHECK(lua_str.find("vertices") != std::string::npos);
+
+    auto reloaded = lua::load_scene_from_string(lua_str);
+    REQUIRE(reloaded.has_value());
+    REQUIRE(reloaded->root != nullptr);
+}
+
+TEST_CASE("serialize_scene: group with children round-trip",
+          "[lua][serializer]") {
+    // A group with a non-identity transform should preserve the group
+    // structure in the serialized output (identity groups are flattened).
+    auto original = lua::load_scene_from_string(R"lua(
+        return {
+            camera = {
+                position = {0, 0, 5},
+                target = {0, 0, 0},
+                up = {0, 1, 0},
+            },
+            scene = {
+                {
+                    type = "group",
+                    transform = { translate = {1, 0, 0} },
+                    children = {
+                        { type = "sphere" },
+                        { type = "box" },
+                    },
+                },
+            },
+        }
+    )lua");
+    REQUIRE(original.has_value());
+
+    auto lua_str = lua::serialize_scene(*original);
+
+    CHECK(lua_str.find("group") != std::string::npos);
+    CHECK(lua_str.find("children") != std::string::npos);
+
+    auto reloaded = lua::load_scene_from_string(lua_str);
+    REQUIRE(reloaded.has_value());
+    REQUIRE(reloaded->root != nullptr);
+}
+
+TEST_CASE("serialize_scene: transform with translation round-trip",
+          "[lua][serializer]") {
+    auto original = lua::load_scene_from_string(R"lua(
+        return {
+            camera = {
+                position = {0, 0, 5},
+                target = {0, 0, 0},
+                up = {0, 1, 0},
+            },
+            scene = {
+                {
+                    type = "sphere",
+                    transform = {
+                        translate = {3, 4, 5},
+                    },
+                },
+            },
+        }
+    )lua");
+    REQUIRE(original.has_value());
+
+    auto lua_str = lua::serialize_scene(*original);
+
+    CHECK(lua_str.find("translate") != std::string::npos);
+    CHECK(lua_str.find("3") != std::string::npos);
+    CHECK(lua_str.find("4") != std::string::npos);
+    CHECK(lua_str.find("5") != std::string::npos);
+
+    auto reloaded = lua::load_scene_from_string(lua_str);
+    REQUIRE(reloaded.has_value());
+    REQUIRE(reloaded->root != nullptr);
+}
+
+TEST_CASE("serialize_scene: transform with uniform scale round-trip",
+          "[lua][serializer]") {
+    auto original = lua::load_scene_from_string(R"lua(
+        return {
+            camera = {
+                position = {0, 0, 5},
+                target = {0, 0, 0},
+                up = {0, 1, 0},
+            },
+            scene = {
+                {
+                    type = "sphere",
+                    transform = {
+                        scale = 2.5,
+                    },
+                },
+            },
+        }
+    )lua");
+    REQUIRE(original.has_value());
+
+    auto lua_str = lua::serialize_scene(*original);
+
+    CHECK(lua_str.find("scale") != std::string::npos);
+
+    auto reloaded = lua::load_scene_from_string(lua_str);
+    REQUIRE(reloaded.has_value());
+    REQUIRE(reloaded->root != nullptr);
+}
+
+TEST_CASE("serialize_scene: camera position round-trip", "[lua][serializer]") {
+    auto original = lua::load_scene_from_string(R"lua(
+        return {
+            camera = {
+                position = {1, 2, 3},
+                target = {0, 0, 0},
+                up = {0, 1, 0},
+            },
+            scene = {
+                { type = "sphere" },
+            },
+        }
+    )lua");
+    REQUIRE(original.has_value());
+
+    auto lua_str = lua::serialize_scene(*original);
+
+    CHECK(lua_str.find("camera") != std::string::npos);
+    CHECK(lua_str.find("position") != std::string::npos);
+    CHECK(lua_str.find("target") != std::string::npos);
+    CHECK(lua_str.find("up") != std::string::npos);
+
+    auto reloaded = lua::load_scene_from_string(lua_str);
+    REQUIRE(reloaded.has_value());
+    REQUIRE(reloaded->root != nullptr);
+}
+
+TEST_CASE("serialize_scene: accelerator setting preserved",
+          "[lua][serializer]") {
+    auto original = lua::load_scene_from_string(R"lua(
+        return {
+            render = { accelerator = "linear" },
+            camera = {
+                position = {0, 0, 5},
+                target = {0, 0, 0},
+                up = {0, 1, 0},
+            },
+            scene = {
+                { type = "sphere" },
+            },
+        }
+    )lua");
+    REQUIRE(original.has_value());
+
+    auto lua_str = lua::serialize_scene(*original);
+    auto reloaded = lua::load_scene_from_string(lua_str);
+    REQUIRE(reloaded.has_value());
+
+    CHECK(reloaded->accelerator == "linear");
+}
+
+TEST_CASE("serialize_scene: identity transform omitted", "[lua][serializer]") {
+    auto original = lua::load_scene_from_string(R"lua(
+        return {
+            camera = {
+                position = {0, 0, 5},
+                target = {0, 0, 0},
+                up = {0, 1, 0},
+            },
+            scene = {
+                { type = "sphere" },
+            },
+        }
+    )lua");
+    REQUIRE(original.has_value());
+
+    auto lua_str = lua::serialize_scene(*original);
+
+    // A sphere with identity transform should NOT have a transform field
+    // (The "transform" substring should only appear in the render/camera
+    // context, not in the scene node)
+    auto scene_start = lua_str.find("scene");
+    REQUIRE(scene_start != std::string::npos);
+    auto scene_section = lua_str.substr(scene_start);
+    CHECK(scene_section.find("transform") == std::string::npos);
+}
+
+TEST_CASE("serialize_scene: nested groups round-trip", "[lua][serializer]") {
+    auto original = lua::load_scene_from_string(R"lua(
+        return {
+            camera = {
+                position = {0, 0, 5},
+                target = {0, 0, 0},
+                up = {0, 1, 0},
+            },
+            scene = {
+                {
+                    type = "group",
+                    transform = { translate = {1, 0, 0} },
+                    children = {
+                        {
+                            type = "group",
+                            transform = { translate = {0, 1, 0} },
+                            children = {
+                                { type = "sphere" },
+                            },
+                        },
+                        { type = "box" },
+                    },
+                },
+            },
+        }
+    )lua");
+    REQUIRE(original.has_value());
+
+    auto lua_str = lua::serialize_scene(*original);
+    auto reloaded = lua::load_scene_from_string(lua_str);
+    REQUIRE(reloaded.has_value());
+    REQUIRE(reloaded->root != nullptr);
+
+    // Should be parseable: that's the main round-trip guarantee
 }

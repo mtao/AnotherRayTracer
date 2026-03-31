@@ -68,6 +68,7 @@ if lua_enabled
       'src/lua/bind_image.cpp',
       'src/lua/bind_transform.cpp',
       'src/lua/scene_loader.cpp',
+      'src/lua/scene_serializer.cpp',
   ]
 endif
 
