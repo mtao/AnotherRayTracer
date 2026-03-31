@@ -136,6 +136,9 @@ if lua_enabled
 endif
 
 
+if get_option('tools')
+  subdir('tools')
+endif
 if get_option('testing')
   subdir('tests')
 endif

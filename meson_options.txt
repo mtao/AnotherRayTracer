@@ -4,3 +4,4 @@ option('exr', type : 'boolean', value : false, description : 'EXR image I/O via 
 option('png', type : 'boolean', value : false, description : 'PNG image I/O via stb_image')
 option('viewer', type : 'boolean', value : false, description : 'Build viewer tool via balsa::visualization')
 option('lua', type : 'boolean', value : false, description : 'Lua scene description via sol2')
+option('tools', type : 'boolean', value : true, description : 'Install Lua tool scripts')
