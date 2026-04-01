@@ -78,9 +78,18 @@ local function validate_lua_syntax(lua_source, source_name)
     return true, result
 end
 
+--- Maximum PBRT output size (bytes) to validate with `pbrt --format`.
+--- Larger files (e.g. 3M placeholder spheres for curve-heavy scenes) are skipped.
+local MAX_PBRT_VALIDATE_SIZE = 50 * 1024 * 1024  -- 50 MB
+
 --- Validate PBRT source by running `pbrt --format` on it.
---- Returns true on success, false + error message on failure.
+--- Returns true on success, false + error message on failure,
+--- or true + "skipped" if the output exceeds the size limit.
 local function validate_with_pbrt(pbrt_source, pbrt_bin)
+    if #pbrt_source > MAX_PBRT_VALIDATE_SIZE then
+        return true, "skipped (output too large: " .. math.floor(#pbrt_source / 1024 / 1024) .. " MB)"
+    end
+
     local tmpf = os.tmpname()
     local f = io.open(tmpf, "w")
     if not f then return false, "cannot create temp file" end
@@ -94,13 +103,20 @@ local function validate_with_pbrt(pbrt_source, pbrt_bin)
     local exit_code = tonumber(exit_str) or 1
 
     if exit_code ~= 0 then
+        os.remove(tmpf)
+        -- Decode signal-based exits
+        if exit_code >= 128 then
+            local sig = exit_code - 128
+            local signames = {[11] = "SIGSEGV", [9] = "SIGKILL", [6] = "SIGABRT"}
+            local signame = signames[sig] or ("signal " .. sig)
+            return false, string.format("pbrt crashed (%s, exit %d)", signame, exit_code)
+        end
         -- Re-run to capture error message
         handle = io.popen(string.format('%s --format "%s" 2>&1', pbrt_bin, tmpf))
         local output = handle:read("*a")
         handle:close()
-        os.remove(tmpf)
         -- Extract first error line
-        local errmsg = "unknown error"
+        local errmsg = "unknown error (exit " .. exit_code .. ")"
         for line in output:gmatch("[^\n]+") do
             if line:lower():match("error") then
                 errmsg = line
@@ -168,6 +184,7 @@ local function main()
     local roundtrip_fail = 0
     local pbrt_pass = 0
     local pbrt_fail = 0
+    local pbrt_skip = 0
     local failures = {}
 
     for i, filepath in ipairs(files) do
@@ -194,15 +211,22 @@ local function main()
                 -- Step 2: optional pbrt binary validation (PBRT -> Lua -> PBRT -> pbrt --format)
                 if pbrt_bin then
                     local pbrt_source = l2p.to_pbrt(result)
-                    local pbrt_ok, pbrt_err = validate_with_pbrt(pbrt_source, pbrt_bin)
+                    local pbrt_ok, pbrt_info = validate_with_pbrt(pbrt_source, pbrt_bin)
                     if pbrt_ok then
-                        pbrt_pass = pbrt_pass + 1
-                        if verbose then
-                            io.stderr:write(string.format("  [PBRT-PASS] %s\n", short))
+                        if pbrt_info and pbrt_info:match("^skipped") then
+                            pbrt_skip = pbrt_skip + 1
+                            if verbose then
+                                io.stderr:write(string.format("  [PBRT-SKIP] %s: %s\n", short, pbrt_info))
+                            end
+                        else
+                            pbrt_pass = pbrt_pass + 1
+                            if verbose then
+                                io.stderr:write(string.format("  [PBRT-PASS] %s\n", short))
+                            end
                         end
                     else
                         pbrt_fail = pbrt_fail + 1
-                        local msg = string.format("  [PBRT-FAIL] %s: %s", short, pbrt_err)
+                        local msg = string.format("  [PBRT-FAIL] %s: %s", short, pbrt_info)
                         failures[#failures + 1] = msg
                         if verbose then io.stderr:write(msg .. "\n") end
                         if stop_on_error then break end
@@ -249,8 +273,8 @@ local function main()
     io.stderr:write(string.format("  PBRT -> Lua:  %d pass, %d fail (of %d files)\n",
         pass, fail, #files))
     if pbrt_bin then
-        io.stderr:write(string.format("  pbrt verify:  %d pass, %d fail\n",
-            pbrt_pass, pbrt_fail))
+        io.stderr:write(string.format("  pbrt verify:  %d pass, %d fail, %d skipped\n",
+            pbrt_pass, pbrt_fail, pbrt_skip))
     end
     if do_roundtrip then
         io.stderr:write(string.format("  Round-trip:   %d pass, %d fail\n",

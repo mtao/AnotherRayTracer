@@ -153,6 +153,9 @@ function Parser.new(tokens)
         base_dir = ".",
         -- Collected TODO comments for unsupported features
         todos = {},               -- list of strings
+        -- Warning dedup: key -> count
+        warning_counts = {},
+        warning_limit = 3,        -- max times to print same warning
     }, Parser)
 end
 
@@ -166,12 +169,24 @@ function Parser:advance()
     return t
 end
 
+--- Emit a warning with dedup: same key is printed at most `warning_limit` times.
+--- On the (limit+1)th occurrence, a "suppressing further" notice is emitted.
+function Parser:warn(key, msg)
+    local count = (self.warning_counts[key] or 0) + 1
+    self.warning_counts[key] = count
+    if count <= self.warning_limit then
+        io.stderr:write("warning: " .. msg .. "\n")
+    elseif count == self.warning_limit + 1 then
+        io.stderr:write(string.format("warning: suppressing further '%s' warnings (%d so far)\n", key, count))
+    end
+end
+
 function Parser:expect_type(typ)
     local t = self:advance()
     if not t or t.type ~= typ then
-        io.stderr:write(string.format(
-            "warning: expected %s, got %s at token %d\n",
-            typ, t and t.type or "EOF", self.pos - 1))
+        local got = t and t.type or "EOF"
+        self:warn("expected_" .. typ,
+            string.format("expected %s, got %s at token %d", typ, got, self.pos - 1))
         return nil
     end
     return t
@@ -816,7 +831,8 @@ function Parser:handle_ObjectInstance()
 
     local obj_nodes = self.objects[name]
     if not obj_nodes or #obj_nodes == 0 then
-        io.stderr:write(string.format("warning: ObjectInstance '%s' not found\n", name))
+        self:warn("ObjectInstance:" .. name,
+            string.format("ObjectInstance '%s' not found", name))
         return
     end
 
@@ -831,13 +847,45 @@ function Parser:handle_Include()
     if not path_tok then return end
 
     local filepath = self.base_dir .. "/" .. path_tok.value
-    local f = io.open(filepath, "r")
-    if not f then
-        io.stderr:write(string.format("warning: cannot open Include file: %s\n", filepath))
-        return
+    local content
+
+    if filepath:match("%.gz$") then
+        -- Check compressed file size before decompressing
+        local stat_handle = io.popen(string.format('stat -c%%s "%s" 2>/dev/null', filepath))
+        local file_size = stat_handle and tonumber(stat_handle:read("*a"))
+        if stat_handle then stat_handle:close() end
+
+        -- Skip very large compressed files (>10MB compressed likely means 100MB+ decompressed)
+        local max_gz_size = 10 * 1024 * 1024
+        if file_size and file_size > max_gz_size then
+            self:warn("Include:gz_large:" .. filepath,
+                string.format("skipping large gzipped Include (%d MB compressed): %s",
+                    math.floor(file_size / 1024 / 1024), path_tok.value))
+            self:add_todo(string.format("Include '%s' skipped (large gzipped file)", path_tok.value))
+            return
+        end
+
+        -- Decompress gzipped includes via gzip -dc
+        local handle = io.popen(string.format('gzip -dc "%s" 2>/dev/null', filepath))
+        if handle then
+            content = handle:read("*a")
+            handle:close()
+        end
+        if not content or #content == 0 then
+            self:warn("Include:" .. filepath,
+                string.format("cannot decompress Include file: %s", filepath))
+            return
+        end
+    else
+        local f = io.open(filepath, "r")
+        if not f then
+            self:warn("Include:" .. filepath,
+                string.format("cannot open Include file: %s", filepath))
+            return
+        end
+        content = f:read("*a")
+        f:close()
     end
-    local content = f:read("*a")
-    f:close()
 
     -- Tokenize and parse the included file
     local inc_tokens = tokenize(content)
@@ -1005,6 +1053,14 @@ function Parser:parse(source)
     self.tokens = tokenize(source)
     self.pos = 1
     self:parse_directives()
+    -- Print summary of suppressed warnings
+    for key, count in pairs(self.warning_counts) do
+        if count > self.warning_limit then
+            io.stderr:write(string.format(
+                "warning: '%s' occurred %d times total (%d suppressed)\n",
+                key, count, count - self.warning_limit))
+        end
+    end
 end
 
 -- ════════════════════════════════════════════════════════════════════
