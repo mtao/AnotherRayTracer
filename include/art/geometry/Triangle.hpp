@@ -29,6 +29,11 @@ class ART_API Triangle : public Geometry {
     auto intersect(const Ray &ray, std::optional<Intersection> &isect) const
         -> bool override;
 
+    // Accessors for serialization / introspection
+    auto vertices() const -> const std::array<Vector3d, 3> &;
+    auto normals() const -> const std::optional<std::array<Vector3d, 3>> &;
+    auto uvs() const -> const std::optional<std::array<Vector2d, 3>> &;
+
   private:
     std::array<Vector3d, 3> m_vertices;
     std::optional<std::array<Vector3d, 3>> m_normals;

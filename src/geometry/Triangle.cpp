@@ -25,6 +25,19 @@ Triangle::Triangle(Vector3d v0,
                    Vector2d uv2)
   : m_vertices{v0, v1, v2}, m_uvs{std::array<Vector2d, 3>{uv0, uv1, uv2}} {}
 
+auto Triangle::vertices() const -> const std::array<Vector3d, 3> & {
+    return m_vertices;
+}
+
+auto Triangle::normals() const
+    -> const std::optional<std::array<Vector3d, 3>> & {
+    return m_normals;
+}
+
+auto Triangle::uvs() const -> const std::optional<std::array<Vector2d, 3>> & {
+    return m_uvs;
+}
+
 auto Triangle::bounding_box() const -> Box {
     const auto &v0 = m_vertices[0];
     const auto &v1 = m_vertices[1];
