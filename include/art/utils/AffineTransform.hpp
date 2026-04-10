@@ -1,6 +1,6 @@
 #pragma once
 
-#include <zipper/transform/transform.hpp>
+#include <zipper/transform/all.hpp>
 
 #include "art/zipper_types.hpp"
 
@@ -11,4 +11,4 @@ using AffineTransform = zipper::transform::AffineTransform<double, 3>;
 using Isometry = zipper::transform::Isometry<double, 3>;
 using ProjectiveTransform = zipper::transform::ProjectiveTransform<double, 3>;
 
-}  // namespace art::utils
+} // namespace art::utils
