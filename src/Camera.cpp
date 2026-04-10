@@ -1,14 +1,17 @@
 #include "art/Camera.hpp"
 
-#include <iostream>
-#include <zipper/transform/transform.hpp>
+#include <cmath>
+
+#include <zipper/transform/all.hpp>
 
 #include "art/Ray.hpp"
 #include "art/utils/AffineTransform.hpp"
+
 namespace art {
 
-utils::Isometry Camera::lookAt(const Point& position, const Point& target,
-                                const Point& up) {
+utils::Isometry Camera::lookAt(const Point &position,
+                               const Point &target,
+                               const Point &up) {
     // Convert Points to Vector3d (divides numerator by denominator)
     Vector3d eye = position;
     Vector3d center = target;
@@ -16,7 +19,9 @@ utils::Isometry Camera::lookAt(const Point& position, const Point& target,
     return zipper::transform::look_at(eye, center, up_vec);
 }
 
-Image Camera::render(size_t nx, size_t ny, objects::SceneNode& node) const {
+Image Camera::render(size_t nx, size_t ny, objects::SceneNode &node) const {
+    Image image(nx, ny);
+
     Ray ray;
     ray.origin = Point(0, 0, 0);
 
@@ -38,13 +43,20 @@ Image Camera::render(size_t nx, size_t ny, objects::SceneNode& node) const {
 
             std::optional<Intersection> isect;
             if (node.intersect(ray, isect)) {
-                std::cout << "o";
+                // Headlight shading: abs(N . view_dir) gives a basic
+                // diffuse look without requiring separate light sources.
+                double dir_len = ray.direction.norm<2>();
+                Vector3d n = isect->normal.normalized();
+                float shade = static_cast<float>(
+                    std::abs(n.dot(ray.direction) / dir_len));
+                image.set_pixel(i, j, shade, shade, shade, 1.f);
             } else {
-                std::cout << ".";
+                image.set_pixel(i, j, 0.f, 0.f, 0.f, 1.f);
             }
+            image.increment_progress();
         }
-        std::cout << std::endl;
     }
-    return {};
+    return image;
 }
-}  // namespace art
+
+} // namespace art

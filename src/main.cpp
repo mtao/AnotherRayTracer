@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <zipper/transform/transform.hpp>
+#include <zipper/transform/all.hpp>
 
 #include "art/Camera.hpp"
 #include "art/geometry/Box.hpp"
@@ -63,7 +63,7 @@ void both() {
 
     Image img = cam.render(100, 100, *scene);
 }
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     sphere();
     cube();
     both();
