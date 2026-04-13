@@ -1,6 +1,6 @@
 #pragma once
 
-#include <zipper/transform/transform.hpp>
+#include <zipper/transform/all.hpp>
 
 #include "art/zipper_types.hpp"
 

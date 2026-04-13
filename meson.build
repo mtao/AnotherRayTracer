@@ -1,6 +1,6 @@
 project('AnotherRayTracer', 'cpp',
   version : '0.1',
-  default_options : ['warning_level=3', 'cpp_std=c++26'])
+  default_options : ['warning_level=3', 'cpp_std=c++26,vc++latest'])
 
 
 
@@ -10,15 +10,11 @@ spdlog_version = '>=1.9.2'
 
 
 cc = meson.get_compiler('cpp')
-dl_lib = cc.find_library('dl')
-
 
 spdlog_dep = dependency('spdlog', version: spdlog_version, default_options: ['tests=disabled'])
 
 zipper_proj = subproject('zipper', default_options: {'testing': false, 'examples': false})
 zipper_dep = zipper_proj.get_variable('zipper_dep')
-
-TBB_dep = dependency('tbb')
 
 required_deps = [zipper_dep]
 internal_deps = [spdlog_dep] + required_deps
@@ -60,7 +56,7 @@ art_dep = declare_dependency(
   include_directories: include_dirs)
 
 
-art_exec = executable('art', 'src/main.cpp', dependencies: [art_dep] + internal_deps)
+art_exec = executable('art-cli', 'src/main.cpp', dependencies: [art_dep] + internal_deps)
 
 
 if get_option('testing')

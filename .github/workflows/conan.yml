@@ -62,7 +62,13 @@ jobs:
       - name: Install GCC 15 (Linux)
         if: runner.os == 'Linux'
         run: |
-          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          # Retry PPA setup — Launchpad occasionally returns transient
+          # GPGKeyTemporarilyNotFoundError (HTTP 500) errors.
+          for i in 1 2 3 4 5; do
+            sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test && break
+            echo "Attempt $i failed, retrying in 10s..."
+            sleep 10
+          done
           sudo apt-get update
           sudo apt-get install -y gcc-15 g++-15 ccache
 
@@ -79,7 +85,17 @@ jobs:
 
       - name: Install pkg-config (Windows)
         if: runner.os == 'Windows'
-        run: choco install pkgconfiglite
+        shell: pwsh
+        run: |
+          # Retry choco install — chocolatey community feed occasionally
+          # returns 504 Gateway Timeout errors.
+          foreach ($i in 1..5) {
+            choco install pkgconfiglite -y
+            if ($LASTEXITCODE -eq 0) { break }
+            Write-Host "Attempt $i failed, retrying in 10s..."
+            Start-Sleep -Seconds 10
+          }
+          if ($LASTEXITCODE -ne 0) { exit 1 }
 
       # -- Conan --
       - name: Create conan profile (Unix)
@@ -122,11 +138,26 @@ jobs:
           ccache -z
 
       # -- Build & Test --
+      - name: Write compiler native file (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p builddir
+          {
+            echo "[binaries]"
+            echo "c = '${{ matrix.platform.cc }}'"
+            echo "cpp = '${{ matrix.platform.cxx }}'"
+          } > builddir/compiler.ini
+
       - name: Configure
         env:
           CC: ${{ runner.os != 'Windows' && format('ccache {0}', matrix.platform.cc) || matrix.platform.cc }}
           CXX: ${{ runner.os != 'Windows' && format('ccache {0}', matrix.platform.cxx) || matrix.platform.cxx }}
-        run: meson setup builddir/ --native-file builddir/conan/conan_meson_native.ini
+        run: >
+          meson setup builddir/
+          --wrap-mode=forcefallback
+          --native-file builddir/conan/conan_meson_native.ini
+          ${{ runner.os != 'Windows' && '--native-file builddir/compiler.ini' || '' }}
 
       - name: Build
         run: meson compile -C builddir/
