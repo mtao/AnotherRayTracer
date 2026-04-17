@@ -1,4 +1,5 @@
-#pragma once
+#if !defined(ART_ZIPPER_TYPES_HPP)
+#define ART_ZIPPER_TYPES_HPP
 
 #include <zipper/Form.hpp>
 #include <zipper/Matrix.hpp>
@@ -31,3 +32,4 @@ concept Vector3Like = zipper::concepts::Vector<T> &&
                       zipper::concepts::ValidExtents<T, 3>;
 
 }  // namespace art
+#endif

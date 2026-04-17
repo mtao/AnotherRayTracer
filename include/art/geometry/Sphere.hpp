@@ -1,4 +1,5 @@
-#pragma once
+#if !defined(ART_GEOMETRY_SPHERE_HPP)
+#define ART_GEOMETRY_SPHERE_HPP
 #include "art/export.hpp"
 #include "art/geometry/Geometry.hpp"
 
@@ -14,3 +15,4 @@ class ART_API Sphere : public Geometry {
     Rational radius = 1.;
 };
 }  // namespace art::geometry
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#if !defined(ART_OBJECTS_OBJECT_HPP)
+#define ART_OBJECTS_OBJECT_HPP
 #include <memory>
 
 #include "art/export.hpp"
@@ -25,3 +26,4 @@ class ART_API Object : public SceneNode {
     // AffineTransform _transform;
 };
 }  // namespace art::objects
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#if !defined(ART_RAY_HPP)
+#define ART_RAY_HPP
 #include "art/Intersection.hpp"
 #include "art/Point.hpp"
 #include "art/export.hpp"
@@ -16,3 +17,4 @@ struct ART_API Ray {
 };
 ART_API std::string format_as(const Ray& r);
 }  // namespace art
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#if !defined(ART_RATIONAL_HXX)
+#define ART_RATIONAL_HXX
 #include <cmath>
 
 #include "art/Rational.hpp"
@@ -56,3 +57,4 @@ ART_INLINE std::weak_ordering Rational::operator<=>(const Rational& o) const {
 }
 
 }  // namespace art
+#endif

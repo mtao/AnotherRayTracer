@@ -1,4 +1,5 @@
-#pragma once
+#if !defined(ART_POINT_HPP)
+#define ART_POINT_HPP
 #include "art/Rational.hpp"
 #include "art/export.hpp"
 #include "art/zipper_types.hpp"
@@ -76,4 +77,5 @@ struct std::formatter<art::Point> : std::formatter<std::string> {
 
 #if !defined(ART_REDUCE_INLINING)
 #include "Point.hxx"
+#endif
 #endif
